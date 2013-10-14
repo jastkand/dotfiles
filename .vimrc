@@ -1,3 +1,5 @@
+execute pathogen#infect()
+
 syntax on                         " show syntax highlig
 
 filetype plugin indent on
@@ -26,4 +28,13 @@ set wildmenu                      " enable bash style tab completion
 
 " set dark background and color scheme
 set background=dark
-colorscheme base16-railscasts
+colorscheme solarized
+
+if has('gui_running')
+  set guifont=Menlo:h12    " set fonts for gui vim
+  set transparency=5        " set transparent window
+  set guioptions=egmrt  " hide the gui menubar
+endif
+
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
