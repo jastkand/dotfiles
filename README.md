@@ -16,7 +16,7 @@ Patched fonts for agnoster theme: https://gist.github.com/qrush/1595572
 
 Agnoster theme patch: https://gist.github.com/cscheid/6194756
 
-    $ cd .oh-my-zsh/themes
+    $ cd ~/.oh-my-zsh/themes
     $ patch -p2 < unbreak_powerline.patch
     
     diff --git a/themes/agnoster.zsh-theme b/themes/agnoster.zsh-theme
