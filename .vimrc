@@ -1,3 +1,6 @@
+scriptencoding utf-8
+set encoding=utf-8
+
 execute pathogen#infect()
 
 syntax on                         " show syntax highlig
