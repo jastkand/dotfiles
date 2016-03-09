@@ -41,3 +41,14 @@ Solarized theme: https://github.com/altercation/solarized
       set transparency=5        " set transparent window
       set guioptions=egmrt  " hide the gui menubar
     endif
+
+
+# Aliases
+
+```
+# Runs rails with a bind to lvh.me
+alias lvh='rails s -p 3000 -b lvh.me'
+
+# Removes all local branches which had been already merged to master
+alias grlb='git branch --merged | grep -v "\*" | grep -v master | grep -v dev | xargs -n 1 git branch -d'
+```
