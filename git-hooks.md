@@ -5,6 +5,7 @@
 Add this update hook to your repo
 
 ```bash
+$ mv .git/hooks/update.sample .git/hooks/update
 $ vi .git/hooks/update
 ```
 
