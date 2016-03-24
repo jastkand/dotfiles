@@ -28,6 +28,7 @@ set list listchars=tab:»·,trail:· " show extra space characters
 set nofoldenable                  " disable code folding
 set clipboard=unnamed             " use the system clipboard
 set wildmenu                      " enable bash style tab completion
+set pastetoggle=<F2>              " toggle paste mode using <F2> key
 
 " set dark background and color scheme
 set background=dark
