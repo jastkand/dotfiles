@@ -2,24 +2,25 @@
 
 # Prevent pushing to master
 
-Add this update hook to your repo
+Add this pre-push hook to your repo
 
 ```bash
-$ mv .git/hooks/update.sample .git/hooks/update
-$ vi .git/hooks/update
+$ mv .git/hooks/pre-push.sample .git/hooks/pre-push
+$ vi .git/hooks/pre-push
 ```
 
 ```bash
 #!/bin/sh
-# lock the master branch for pushing
-refname="$1"
 
-if [[ $refname == "refs/heads/master" ]]
-then
+while read local_ref local_sha remote_ref remote_sha
+do
+  if [ "$local_ref" = "refs/heads/master" ]
+  then
     echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     echo " You cannot push to master! It's locked "
     echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     exit 1
-fi
+  fi
+done
 exit 0
 ```
