@@ -5,32 +5,16 @@ Install guide: https://github.com/robbyrussell/oh-my-zsh/blob/master/README.text
 
 List of themes: https://github.com/robbyrussell/oh-my-zsh/wiki/themes
 
-Plugin for highlighting command: https://github.com/zsh-users/zsh-syntax-highlighting
+Plugin for highlighting command: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/INSTALL.md#oh-my-zsh
 
 ---
 
 Agnoster theme
 --------------
 
-Patched fonts for agnoster theme: https://gist.github.com/qrush/1595572
+Powerline fonts repo: https://github.com/powerline/fonts
 
-Agnoster theme patch: https://gist.github.com/cscheid/6194756
-
-    $ cd ~/.oh-my-zsh/themes
-    $ patch -p2 < unbreak_powerline.patch
-    
-    diff --git a/themes/agnoster.zsh-theme b/themes/agnoster.zsh-theme
-    index e652938..a9de8c8 100644
-    --- a/themes/agnoster.zsh-theme
-    +++ b/themes/agnoster.zsh-theme
-    @@ -26,7 +26,7 @@
-     # A few utility functions to make it easy and re-usable to draw segmented prompts
-    
-     CURRENT_BG='NONE'
-    -SEGMENT_SEPARATOR=''
-    +SEGMENT_SEPARATOR='⮀'
-
-Powerline fonts repo: https://github.com/Lokaltog/powerline-fonts
+Monaco Powerline font: https://gist.github.com/baopham/1838072
 
 ---
 
