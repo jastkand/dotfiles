@@ -1,5 +1,4 @@
-ZSH
----
+## ZSH
 
 Install guide: https://github.com/robbyrussell/oh-my-zsh/blob/master/README.textile
 
@@ -7,25 +6,13 @@ List of themes: https://github.com/robbyrussell/oh-my-zsh/wiki/themes
 
 Plugin for highlighting command: https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/INSTALL.md#oh-my-zsh
 
----
-
-Agnoster theme
---------------
+## Agnoster theme
 
 Powerline fonts repo: https://github.com/powerline/fonts
 
 Monaco Powerline font: https://gist.github.com/baopham/1838072
 
----
-
-Solarized theme: https://github.com/altercation/solarized
-
-    if has('gui_running')
-      set guifont=Monaco:h12    " set fonts for gui vim
-      set transparency=5        " set transparent window
-      set guioptions=egmrt  " hide the gui menubar
-    endif
-
+Gruvbox: https://github.com/morhetz/gruvbox
 
 # Aliases
 
