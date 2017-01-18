@@ -36,3 +36,7 @@ alias lvh='rails s -p 3000 -b lvh.me'
 # Removes all local branches which had been already merged to master
 alias grlb='git branch --merged | grep -v "\*" | grep -v master | grep -v dev | xargs -n 1 git branch -d'
 ```
+
+## iTerm 2 Preferences
+
+![](https://monosnap.com/file/TfT2Al997aNhU8YvCZMIjWoDq9CCgX.png)
