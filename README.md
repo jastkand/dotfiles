@@ -14,7 +14,7 @@ Monaco Powerline font: https://gist.github.com/baopham/1838072
 
 Gruvbox: https://github.com/morhetz/gruvbox
 
-# Aliases
+## Aliases
 
 ```
 # Runs rails with a bind to lvh.me
@@ -25,5 +25,7 @@ alias grlb='git branch --merged | grep -v "\*" | grep -v master | grep -v dev | 
 ```
 
 ## iTerm 2 Preferences
+
+Gruvbox theme for iterm2 and others: https://github.com/morhetz/gruvbox-contrib
 
 ![](https://monosnap.com/file/TfT2Al997aNhU8YvCZMIjWoDq9CCgX.png)
