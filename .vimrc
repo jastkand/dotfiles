@@ -20,7 +20,6 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'editorconfig/editorconfig-vim'
-Plugin 'altercation/vim-colors-solarized'
 Plugin 'morhetz/gruvbox'
 Plugin 'kien/ctrlp.vim'
 Plugin 'scrooloose/syntastic'
@@ -131,7 +130,6 @@ set stl=%t\ %m\ %r\ \ %y\ \ %{GitBranch()}\ \ %l/%L[%p%%]\ \ Col:\ %c\ \ Buf:\ #
 
 " set dark background and color scheme
 set background=dark
-" colorscheme solarized
 colorscheme gruvbox
 
 let g:NERDSpaceDelims = 1
