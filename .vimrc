@@ -34,6 +34,9 @@ Plugin 'kassio/neoterm'
 Plugin 'romainl/vim-qf'
 Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'mileszs/ack.vim'
+Plugin 'othree/yajs.vim'
+Plugin 'othree/es.next.syntax.vim'
+Plugin 'kchmck/vim-coffee-script'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -43,6 +46,8 @@ filetype on           " Enable filetype detection
 filetype indent on    " Enable filetype-specific indenting
 filetype plugin on    " Enable filetype-specific plugins
 
+" consider es6 files as javascript ones
+au BufNewFile,BufRead *.es6 set filetype=javascript
 
 autocmd FileType ruby compiler ruby
 
