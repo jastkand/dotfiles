@@ -33,6 +33,7 @@ Plugin 'jiangmiao/auto-pairs'
 Plugin 'kassio/neoterm'
 Plugin 'romainl/vim-qf'
 Plugin 'AndrewRadev/splitjoin.vim'
+Plugin 'ngmy/vim-rubocop'
 Plugin 'mileszs/ack.vim'
 Plugin 'othree/yajs.vim'
 Plugin 'othree/es.next.syntax.vim'
@@ -126,6 +127,8 @@ set background=dark
 colorscheme gruvbox
 
 let g:NERDSpaceDelims = 1
+let g:NERDDefaultAlign = 'left'
+
 let NERDTreeMinimalUI = 1
 let NERDTreeShowHidden = 1
 
@@ -218,9 +221,6 @@ nnoremap <silent> <Esc><Esc> :let @/=""<CR>
 
 map <Leader>m :Vexplore db/migrate<CR>
 
-" quickfix open in new tab shortcut
-nnoremap <c-x>t <c-w><cr><c-w>T
-
 nnoremap S "_diwP
 vnoremap S "_dP
 
@@ -228,3 +228,13 @@ vnoremap S "_dP
 nnoremap <Leader>b :e#<CR>
 
 nnoremap gG :call GotoFirstEffectiveLine()<CR>
+
+let g:vimrubocop_keymap = 0
+nmap <Leader>r :RuboCop<CR>
+
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
+
+let g:syntastic_ignore_files = ['\.scss$']
