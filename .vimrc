@@ -159,7 +159,6 @@ nnoremap \ :Ack!<SPACE>
 autocmd BufWritePre * StripWhitespace
 
 " Run a given vim command on the results of alt from a given path.
-" See usage below.
 function! AltCommand(path, vim_command)
   let l:alternate = system("alt " . a:path)
   if empty(l:alternate)
@@ -191,6 +190,7 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 let g:neoterm_position = 'horizontal'
 
+" Use Alt-j/k to move lines up and down
 nnoremap ∆ :m .+1<CR>==
 nnoremap ˚ :m .-2<CR>==
 inoremap ∆ <Esc>:m .+1<CR>==gi
@@ -225,6 +225,6 @@ nnoremap S "_diwP
 vnoremap S "_dP
 
 " navigate to previos buffer
-nnoremap <Leader>g :e#<CR>
+nnoremap <Leader>b :e#<CR>
 
 nnoremap gG :call GotoFirstEffectiveLine()<CR>
