@@ -109,9 +109,9 @@ set nofoldenable                  " disable code folding
 set clipboard=unnamed             " use the system clipboard
 
 " No backup and swap files
-set nobackup
-set nowritebackup
-set noswapfile                    " http://robots.thoughtbot.com/post/18739402579/global-gitignore#comment-458413287
+" set nobackup
+" set nowritebackup
+" set noswapfile                    " http://robots.thoughtbot.com/post/18739402579/global-gitignore#comment-458413287
 
 set wildmenu                      " enable bash style tab completion
 set pastetoggle=<F2>
