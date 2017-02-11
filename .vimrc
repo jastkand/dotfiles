@@ -42,22 +42,8 @@ filetype on           " Enable filetype detection
 filetype indent on    " Enable filetype-specific indenting
 filetype plugin on    " Enable filetype-specific plugins
 
+
 autocmd FileType ruby compiler ruby
-
-" Returns branch in square brackets or empty string based on fugitive#head output
-function! GitBranch()
-  if !exists('*fugitive#head')
-    return ''
-  endif
-
-  let branch = fugitive#head(7)
-
-  if branch == ''
-    return ''
-  endif
-
-  return '[' . branch . ']'
-endfunction
 
 " Navigates to the first non-comment line. Thanks to https://github.com/vim-scripts/FirstEffectiveLine.vim
 function! GotoFirstEffectiveLine()
@@ -126,7 +112,7 @@ set autoread                      " Automatically read files when they were chan
 set re=1                          " Use new regex engine
 
 " status line layout
-set stl=%t\ %m\ %r\ \ %y\ \ %{GitBranch()}\ \ %l/%L[%p%%]\ \ Col:\ %c\ \ Buf:\ #%n\
+set stl=%t\ %m\ %r\ \ %y\ \ %{fugitive#statusline()}\ \ %l/%L[%p%%]\ \ Col:\ %c\ \ Buf:\ #%n\
 
 " set dark background and color scheme
 set background=dark
