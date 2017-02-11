@@ -33,6 +33,7 @@ Plugin 'jiangmiao/auto-pairs'
 Plugin 'kassio/neoterm'
 Plugin 'romainl/vim-qf'
 Plugin 'AndrewRadev/splitjoin.vim'
+Plugin 'mileszs/ack.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -129,14 +130,13 @@ endif
 
 " The Silver Searcher
 if executable('ag')
-  " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor
-
   " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
   " ag is fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching = 0
+
+  let g:ackprg = 'ag --vimgrep --nogroup --nocolor'
 endif
 
 let g:UltiSnipsExpandTrigger="<tab>"
@@ -144,11 +144,10 @@ let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " bind K to grep word under cursor
-nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
+nnoremap K :Ack! "\b<C-R><C-W>\b"<CR>:cw<CR>
 
 " bind \ (backward slash) to grep shortcut
-command! -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
-nnoremap \ :Ag<SPACE>
+nnoremap \ :Ack!<SPACE>
 
 " Strip whitespaces on save
 autocmd BufWritePre * StripWhitespace
