@@ -217,9 +217,9 @@ map <Leader>K :Gpush<CR>
 map <C-\> :NERDTreeToggle<CR>
 map <C-n> :NERDTreeFind<CR>
 
-nnoremap <A-Left> :tabprevious<CR>
+" Use Alt-[ to navigate to previos tab
 nnoremap “ :tabprevious<CR>
-nnoremap <A-Right> :tabnext<CR>
+" Use Alt-] to navigate to next tab
 nnoremap ‘ :tabnext<CR>
 
 " Clear highlighting on double escape in normal mode
