@@ -21,7 +21,6 @@ Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'editorconfig/editorconfig-vim'
 Plugin 'morhetz/gruvbox'
-Plugin 'kien/ctrlp.vim'
 Plugin 'scrooloose/syntastic'
 Plugin 'slim-template/vim-slim'
 Plugin 'tpope/vim-bundler'
@@ -39,6 +38,7 @@ Plugin 'othree/yajs.vim'
 Plugin 'othree/es.next.syntax.vim'
 Plugin 'kchmck/vim-coffee-script'
 Plugin 'kopischke/vim-fetch'
+Plugin 'junegunn/fzf'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -67,6 +67,9 @@ function! GotoFirstEffectiveLine()
 endfunction
 
 let mapleader=" "
+
+" fzf configuration
+set rtp+=/usr/local/opt/fzf
 
 " Indent based on previous line
 set autoindent
@@ -139,12 +142,6 @@ endif
 
 " The Silver Searcher
 if executable('ag')
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-
-  " ag is fast enough that CtrlP doesn't need to cache
-  let g:ctrlp_use_caching = 0
-
   let g:ackprg = 'ag --vimgrep --nogroup --nocolor'
 endif
 
@@ -175,10 +172,6 @@ command! MakeTags !ctags -R --languages=ruby --exclude=.git --exclude=log . $(bu
 
 " Find the alternate file for the current path and open it
 nnoremap <leader>. :w<CR>:call AltCommand(expand('%'), ':tabe')<CR>
-
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_reuse_window = 'NERD_tree_1'
 
 let g:rspec_runner = "os_x_iterm2"
 let g:rspec_command = "!bundle exec spring rspec {spec}"
@@ -244,5 +237,7 @@ noremap <Right> <NOP>
 nnoremap Q <NOP>
 
 nnoremap <Leader>rh :s/:\([^ ]*\)\(\s*\)=>/\1:/g<CR>:noh<CR>
+
+noremap <C-p> :FZF<CR>
 
 let g:syntastic_ignore_files = ['\.scss$']
