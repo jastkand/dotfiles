@@ -236,5 +236,6 @@ noremap <Up> <NOP>
 noremap <Down> <NOP>
 noremap <Left> <NOP>
 noremap <Right> <NOP>
+nnoremap Q <NOP>
 
 let g:syntastic_ignore_files = ['\.scss$']
