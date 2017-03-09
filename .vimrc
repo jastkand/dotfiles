@@ -238,4 +238,6 @@ noremap <Left> <NOP>
 noremap <Right> <NOP>
 nnoremap Q <NOP>
 
+nnoremap <Leader>rh :s/:\([^ ]*\)\(\s*\)=>/\1:/g<CR>:noh<CR>
+
 let g:syntastic_ignore_files = ['\.scss$']
