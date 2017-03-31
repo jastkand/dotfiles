@@ -195,6 +195,11 @@ inoremap ˚ <Esc>:m .-2<CR>==gi
 vnoremap ∆ :m '>+1<CR>gv=gv
 vnoremap ˚ :m '<-2<CR>gv=gv
 
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
 map <Leader>t :w<CR>:call RunCurrentSpecFile()<CR>
 map <Leader>s :w<CR>:call RunNearestSpec()<CR>
 map <Leader>l :w<CR>:call RunLastSpec()<CR>
