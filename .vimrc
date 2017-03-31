@@ -175,7 +175,11 @@ command! MakeTags !ctags -R --languages=ruby --exclude=.git --exclude=log . $(bu
 nnoremap <leader>. :w<CR>:call AltCommand(expand('%'), ':tabe')<CR>
 
 let g:rspec_runner = "os_x_iterm2"
-let g:rspec_command = "!bundle exec spring rspec {spec}"
+if filereadable("bin/spring")
+  let g:rspec_command = "!bundle exec spring rspec {spec}"
+else
+  let g:rspec_command = "!bundle exec rspec {spec}"
+endif
 
 if has("nvim")
   let g:rspec_command = "tabnew | term bundle exec spring rspec {spec}"
