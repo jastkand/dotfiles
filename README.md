@@ -1,6 +1,6 @@
 ## ZSH
 
-Install guide: https://github.com/robbyrussell/oh-my-zsh/blob/master/README.textile
+Install guide: https://github.com/robbyrussell/oh-my-zsh
 
 List of themes: https://github.com/robbyrussell/oh-my-zsh/wiki/themes
 
