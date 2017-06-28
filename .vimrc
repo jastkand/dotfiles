@@ -12,7 +12,7 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'     " let Vundle manage Vundle, required
 Plugin 'tpope/vim-fugitive'       " plugin on GitHub repo
-Plugin 'thoughtbot/vim-rspec'
+Plugin 'sheerun/vim-polyglot'
 Plugin 'scrooloose/nerdtree'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'ntpeters/vim-better-whitespace'
@@ -21,28 +21,32 @@ Plugin 'SirVer/ultisnips'
 Plugin 'honza/vim-snippets'
 Plugin 'editorconfig/editorconfig-vim'
 Plugin 'morhetz/gruvbox'
-Plugin 'scrooloose/syntastic'
-Plugin 'slim-template/vim-slim'
 Plugin 'tpope/vim-bundler'
 Plugin 'tpope/vim-endwise'
 Plugin 'tpope/vim-rails'
 Plugin 'tpope/vim-surround'
-Plugin 'vim-ruby/vim-ruby'
-Plugin 'noprompt/vim-yardoc'
 Plugin 'jiangmiao/auto-pairs'
-Plugin 'kassio/neoterm'
 Plugin 'romainl/vim-qf'
 Plugin 'AndrewRadev/splitjoin.vim'
-Plugin 'ngmy/vim-rubocop'
 Plugin 'mileszs/ack.vim'
 Plugin 'othree/yajs.vim'
 Plugin 'othree/es.next.syntax.vim'
-Plugin 'kchmck/vim-coffee-script'
-Plugin 'kopischke/vim-fetch'
 Plugin 'junegunn/fzf'
+Plugin 'bogado/file-line'
+Plugin 'neomake/neomake'
+Plugin 'tpope/vim-projectionist'
+Plugin 'AndrewRadev/switch.vim'
+Plugin 'janko-m/vim-test'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
+
+function! neomake#makers#ft#ruby#EnabledMakers()
+    return ['mri', 'reek', 'rubylint']
+endfunction
+
+autocmd! BufWritePost * Neomake
+autocmd! BufReadPost * Neomake
 
 syntax on             " show syntax highlig
 filetype on           " Enable filetype detection
@@ -114,9 +118,9 @@ set nofoldenable                  " disable code folding
 set clipboard=unnamed             " use the system clipboard
 
 " No backup and swap files
-" set nobackup
-" set nowritebackup
-" set noswapfile                    " http://robots.thoughtbot.com/post/18739402579/global-gitignore#comment-458413287
+set noswapfile                    " http://robots.thoughtbot.com/post/18739402579/global-gitignore#comment-458413287
+set nobackup
+set nowritebackup
 
 set wildmenu                      " enable bash style tab completion
 set pastetoggle=<F2>
@@ -153,8 +157,8 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 " bind K to grep word under cursor
 nnoremap K :Ack! "\b<C-R><C-W>\b"<CR>:cw<CR>
 
-" bind \ (backward slash) to grep shortcut
-nnoremap \ :Ack!<SPACE>
+" find in project
+nnoremap <Leader>\ :Ack!<SPACE>
 
 " Strip whitespaces on save
 autocmd BufWritePre * StripWhitespace
@@ -172,18 +176,7 @@ endfunction
 command! MakeTags !ctags -R --languages=ruby --exclude=.git --exclude=log . $(bundle list --paths)
 
 " Find the alternate file for the current path and open it
-nnoremap <leader>. :w<CR>:call AltCommand(expand('%'), ':tabe')<CR>
-
-let g:rspec_runner = "os_x_iterm2"
-if filereadable("bin/spring")
-  let g:rspec_command = "!bundle exec spring rspec {spec}"
-else
-  let g:rspec_command = "!bundle exec rspec {spec}"
-endif
-
-if has("nvim")
-  let g:rspec_command = "tabnew | term bundle exec spring rspec {spec}"
-endif
+nnoremap <Leader>. :w<CR>:call AltCommand(expand('%'), ':tabe')<CR>
 
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
@@ -199,14 +192,10 @@ inoremap ˚ <Esc>:m .-2<CR>==gi
 vnoremap ∆ :m '>+1<CR>gv=gv
 vnoremap ˚ :m '<-2<CR>gv=gv
 
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-
-map <Leader>t :w<CR>:call RunCurrentSpecFile()<CR>
-map <Leader>s :w<CR>:call RunNearestSpec()<CR>
-map <Leader>l :w<CR>:call RunLastSpec()<CR>
+nmap <silent> <C-h> <C-w>h
+nmap <silent> <C-j> <C-w>j
+nmap <silent> <C-k> <C-w>k
+nmap <silent> <C-l> <C-w>l
 
 map <Leader>k :Gstatus<CR>7+
 map <Leader>K :Gpush<CR>
@@ -237,17 +226,33 @@ nnoremap <Leader>b :e#<CR>
 
 nnoremap gG :call GotoFirstEffectiveLine()<CR>
 
-let g:vimrubocop_keymap = 0
-nmap <Leader>r :RuboCop<CR>
+nmap <Leader>r :Neomake rubocop<CR>
 
 noremap <Up> <NOP>
 noremap <Down> <NOP>
 noremap <Left> <NOP>
 noremap <Right> <NOP>
 nnoremap Q <NOP>
+nnoremap q: <NOP>
 
-nnoremap <Leader>rh :s/:\([^ ]*\)\(\s*\)=>/\1:/g<CR>:noh<CR>
+if has('nvim')
+  let test#strategy = 'neovim'
+endif
+
+let g:test#preserve_screen = 1
+let test#ruby#bundle_exec = 0
+if filereadable('bin/spring')
+  let test#ruby#rspec#executable = 'bundle exec spring rspec'
+else
+  let test#ruby#rspec#executable = 'bundle exec rspec'
+endif
+
+nmap <Leader>s :w<CR>:TestNearest<CR>
+nmap <Leader>t :w<CR>:TestFile<CR>
+nmap <Leader>l :w<CR>:TestLast<CR>
+
+" nnoremap <Leader>rh :s/:\([^ ]*\)\(\s*\)=>/\1:/g<CR>:noh<CR>
+
+nnoremap <silent> gs :Switch<cr>
 
 noremap <C-p> :FZF<CR>
-
-let g:syntastic_ignore_files = ['\.scss$']
