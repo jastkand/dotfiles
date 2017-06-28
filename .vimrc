@@ -41,12 +41,10 @@ Plugin 'janko-m/vim-test'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 
-function! neomake#makers#ft#ruby#EnabledMakers()
-    return ['mri', 'reek', 'rubylint']
-endfunction
+let g:neomake_ruby_enabled_makers = ['mri']
 
-autocmd! BufWritePost * Neomake
-autocmd! BufReadPost * Neomake
+" autocmd! BufWritePost * Neomake
+" autocmd! BufReadPost * Neomake
 
 syntax on             " show syntax highlig
 filetype on           " Enable filetype detection
@@ -235,6 +233,11 @@ noremap <Right> <NOP>
 nnoremap Q <NOP>
 nnoremap q: <NOP>
 
+:command! Q q
+:command! W w
+nnoremap ; :
+
+
 if has('nvim')
   let test#strategy = 'neovim'
 endif
@@ -251,8 +254,13 @@ nmap <Leader>s :w<CR>:TestNearest<CR>
 nmap <Leader>t :w<CR>:TestFile<CR>
 nmap <Leader>l :w<CR>:TestLast<CR>
 
-" nnoremap <Leader>rh :s/:\([^ ]*\)\(\s*\)=>/\1:/g<CR>:noh<CR>
+" convert `var_name = 'value'` to `let(:var_name) { 'value' }`
+nmap <Leader>ivl 0df@==ilet(<ESC>lxi:<ESC>ea)<ESC>wdwDA{<SPACE><ESC>p
+nmap <Leader>vl 0==ilet(<ESC>lxi:<ESC>ea)<ESC>wdwDA{<SPACE><ESC>p
 
 nnoremap <silent> gs :Switch<cr>
 
 noremap <C-p> :FZF<CR>
+
+set langmap=ФИСВУАПРШОЛДЬТЩЗЙКЫЕГМЦЧНЯ;ABCDEFGHIJKLMNOPQRSTUVWXYZ,фисвуапршолдьтщзйкыегмцчня;abcdefghijklmnopqrstuvwxyz
+nnoremap ж :
