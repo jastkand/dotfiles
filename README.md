@@ -10,7 +10,7 @@ Plugin for highlighting command: https://github.com/zsh-users/zsh-syntax-highlig
 
 Powerline fonts repo: https://github.com/powerline/fonts
 
-Monaco Powerline font: https://gist.github.com/baopham/1838072
+FiraMono Powerline font: https://github.com/powerline/fonts/tree/master/FiraMono
 
 Gruvbox: https://github.com/morhetz/gruvbox
 
