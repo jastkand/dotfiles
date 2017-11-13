@@ -14,3 +14,11 @@ before do
 end
 
 endsnippet
+
+snippet expa "expect action to" b
+expect { action }.to $0
+endsnippet
+
+snippet expac "expect action to change" b
+expect { action }.to change { $0 }
+endsnippet
