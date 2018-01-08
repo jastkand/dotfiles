@@ -220,11 +220,6 @@ nnoremap “ :tabprevious<CR>
 " Use Alt-] to navigate to next tab
 nnoremap ‘ :tabnext<CR>
 
-" Merge with previous line
-nmap <C-u> kJ
-" Delete to the end and merge next line
-nmap <C-d> DJx
-
 " Clear highlighting on double escape in normal mode
 nnoremap <silent> <Esc><Esc> :let @/=""<CR>
 
