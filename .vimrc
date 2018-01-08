@@ -33,11 +33,11 @@ Plugin 'jiangmiao/auto-pairs'
 Plugin 'romainl/vim-qf'
 Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'mileszs/ack.vim'
-Plugin 'junegunn/fzf'
 Plugin 'posva/vim-vue'
 Plugin 'othree/html5.vim'
 Plugin 'pangloss/vim-javascript'
 Plugin 'isRuslan/vim-es6'
+Plugin 'junegunn/fzf.vim'
 Plugin 'bogado/file-line'
 Plugin 'neomake/neomake'
 Plugin 'tpope/vim-projectionist'
@@ -254,10 +254,23 @@ nnoremap q: <NOP>
 :command! W w
 nnoremap ; :
 
+" --column: Show column number
+" --line-number: Show line number
+" --no-heading: Do not show file headings in results
+" --fixed-strings: Search term as a literal string
+" --ignore-case: Case insensitive search
+" --no-ignore: Do not respect .gitignore, etc...
+" --hidden: Search hidden files and folders
+" --follow: Follow symlinks
+" --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+" --color: Search color options
+command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
 
 if has('nvim')
   let test#strategy = 'neovim'
 endif
+
+set grepprg=rg\ --vimgrep
 
 let g:test#preserve_screen = 1
 let test#ruby#bundle_exec = 0
