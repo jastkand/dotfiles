@@ -33,9 +33,11 @@ Plugin 'jiangmiao/auto-pairs'
 Plugin 'romainl/vim-qf'
 Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'mileszs/ack.vim'
-Plugin 'othree/yajs.vim'
-Plugin 'othree/es.next.syntax.vim'
 Plugin 'junegunn/fzf'
+Plugin 'posva/vim-vue'
+Plugin 'othree/html5.vim'
+Plugin 'pangloss/vim-javascript'
+Plugin 'isRuslan/vim-es6'
 Plugin 'bogado/file-line'
 Plugin 'neomake/neomake'
 Plugin 'tpope/vim-projectionist'
@@ -65,8 +67,14 @@ filetype on           " Enable filetype detection
 filetype indent on    " Enable filetype-specific indenting
 filetype plugin on    " Enable filetype-specific plugins
 
+" consider vue files as html
+autocmd BufNewFile,BufRead *.vue set filetype=html
+
 " consider es6 files as javascript ones
-au BufNewFile,BufRead *.es6 set filetype=javascript
+autocmd BufNewFile,BufRead *.es6 set filetype=javascript
+
+" consider axlsx files as ruby ones
+autocmd BufNewFile,BufRead *.axlsx set filetype=ruby
 
 autocmd FileType ruby compiler ruby
 
