@@ -1,5 +1,11 @@
+zsh --version
+
+# Hide computer name
+DEFAULT_USER=$USER
+prompt_context(){}
+
 # Path to your oh-my-zsh configuration.
-ZSH=$HOME/.oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
 
 # For Solarized
 export TERM="xterm-256color"
@@ -28,8 +34,19 @@ alias grlb='git branch --merged | grep -v "\*" | grep -v master | grep -v dev | 
 alias gfp='git fetch -p && git pull'
 alias gss='git stash save'
 alias gsp='git stash pop'
+alias grm='git rebase master'
+alias rbe='PORT=3000 RAILS_MAX_THREADS=2 bundle exec puma -C config/puma.rb'
+alias piqf='yarn dev_webpack'
 
 alias vim="/usr/local/bin/vim"
 alias vi="/usr/local/bin/vim"
+alias emacs="/usr/local/bin/emacs -nw"
 
 source $HOME/.profile
+
+# --files: List files that would be searched but do not search
+# --no-ignore: Do not respect .gitignore, etc...
+# --hidden: Search hidden files and folders
+# --follow: Follow symlinks
+# --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
