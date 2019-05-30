@@ -174,6 +174,8 @@ let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
+let g:neoterm_position = 'horizontal'
+
 " bind K to grep word under cursor
 nnoremap K :Ack! "\b<C-R><C-W>\b"<CR>:cw<CR>
 
