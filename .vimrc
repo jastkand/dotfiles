@@ -198,12 +198,6 @@ command! MakeTags !ctags -R --languages=ruby --exclude=.git --exclude=log . $(bu
 " Find the alternate file for the current path and open it
 nnoremap <Leader>. :w<CR>:call AltCommand(expand('%'), ':tabe')<CR>
 
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-
-let g:neoterm_position = 'horizontal'
-
 " Use Alt-j/k to move lines up and down
 nnoremap ∆ :m .+1<CR>==
 nnoremap ˚ :m .-2<CR>==
