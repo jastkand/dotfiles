@@ -37,6 +37,10 @@ alias gsp='git stash pop'
 alias grm='git rebase master'
 alias rbe='PORT=3000 RAILS_MAX_THREADS=2 bundle exec puma -C config/puma.rb'
 alias piqf='yarn dev_webpack'
+alias rdbm='bundle exec rake db:migrate'
+alias rdbmt='bundle exec rake db:migrate RAILS_ENV=test'
+alias rdbr='bundle exec rake db:rollback'
+alias rdbrt='bundle exec rake db:rollback RAILS_ENV=test'
 
 alias vim="/usr/local/bin/vim"
 alias vi="/usr/local/bin/vim"
