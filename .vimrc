@@ -1,51 +1,53 @@
+if has('python3')
+  silent! python3 1
+endif
+
 scriptencoding utf-8
 set encoding=utf-8
 
-execute pathogen#infect()
-
+set hidden
 set nocompatible                  " don't need to be compatible with old vim
 filetype off                      " required
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+call plug#begin('~/.vim/bundle')
 
-Plugin 'VundleVim/Vundle.vim'     " let Vundle manage Vundle, required
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-rhubarb'
-Plugin 'shumphrey/fugitive-gitlab.vim'
-Plugin 'sheerun/vim-polyglot'
-Plugin 'scrooloose/nerdtree'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'ntpeters/vim-better-whitespace'
-Plugin 'scrooloose/nerdcommenter'
-Plugin 'SirVer/ultisnips'
-Plugin 'honza/vim-snippets'
-Plugin 'editorconfig/editorconfig-vim'
-Plugin 'morhetz/gruvbox'
-Plugin 'tpope/vim-bundler'
-Plugin 'tpope/vim-endwise'
-Plugin 'tpope/vim-rails'
-Plugin 'tpope/vim-surround'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'romainl/vim-qf'
-Plugin 'AndrewRadev/splitjoin.vim'
-Plugin 'mileszs/ack.vim'
-Plugin 'posva/vim-vue'
-Plugin 'othree/html5.vim'
-Plugin 'pangloss/vim-javascript'
-Plugin 'isRuslan/vim-es6'
-Plugin 'junegunn/fzf.vim'
-Plugin 'bogado/file-line'
-Plugin 'neomake/neomake'
-Plugin 'tpope/vim-projectionist'
-Plugin 'AndrewRadev/switch.vim'
-Plugin 'janko-m/vim-test'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'qpkorr/vim-bufkill'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
+Plug 'shumphrey/fugitive-gitlab.vim'
+Plug 'sheerun/vim-polyglot'
+Plug 'scrooloose/nerdtree'
+Plug 'airblade/vim-gitgutter'
+Plug 'ntpeters/vim-better-whitespace'
+Plug 'scrooloose/nerdcommenter'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'morhetz/gruvbox'
+Plug 'tpope/vim-bundler'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-surround'
+Plug 'jiangmiao/auto-pairs'
+Plug 'tmhedberg/matchit'
+Plug 'romainl/vim-qf'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'mileszs/ack.vim'
+Plug 'posva/vim-vue'
+Plug 'othree/html5.vim'
+Plug 'pangloss/vim-javascript'
+Plug 'isRuslan/vim-es6'
+Plug 'digitaltoad/vim-pug'
+Plug 'junegunn/fzf.vim', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'bogado/file-line'
+Plug 'neomake/neomake'
+Plug 'tpope/vim-projectionist'
+Plug 'AndrewRadev/switch.vim'
+Plug 'janko-m/vim-test'
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
+call plug#end()
 
 let g:airline_theme='base16'
 let g:airline_powerline_fonts = 1
@@ -59,6 +61,10 @@ let g:airline#extensions#tabline#show_close_button = 0
 
 let g:neomake_ruby_enabled_makers = ['mri']
 
+let g:neomake_ruby_enabled_makers = ['mri']
+let g:neomake_ruby_rubocop_exe = 'bundle'
+let g:neomake_ruby_rubocop_args = ['exec', 'rubocop']
+
 " autocmd! BufWritePost * Neomake
 " autocmd! BufReadPost * Neomake
 
@@ -67,13 +73,9 @@ filetype on           " Enable filetype detection
 filetype indent on    " Enable filetype-specific indenting
 filetype plugin on    " Enable filetype-specific plugins
 
-" consider vue files as html
-autocmd BufNewFile,BufRead *.vue set filetype=html
-
-" consider es6 files as javascript ones
+autocmd BufNewFile,BufRead *.vue set filetype=vue.html.javascript
+autocmd BufNewFile,BufRead *.html.erb set filetype=html.eruby
 autocmd BufNewFile,BufRead *.es6 set filetype=javascript
-
-" consider axlsx files as ruby ones
 autocmd BufNewFile,BufRead *.axlsx set filetype=ruby
 
 autocmd FileType ruby compiler ruby
@@ -154,9 +156,17 @@ set stl=%t\ %m\ %r\ \ %y\ \ %{fugitive#statusline()}\ \ %l/%L[%p%%]\ \ Col:\ %c\
 set background=dark
 colorscheme gruvbox
 
+" Enable swapping background quickly
+" http://tilvim.com/2013/07/31/swapping-bg.html
+map <Leader>bg :let &background = ( &background == "dark"? "light" : "dark")<CR>
+
+" Replace hash rockets with Ruby 1.9-style hashes
+let @h = ":s/:\\([^=,'\"]*\\) =>/\\1:/g\<C-m>"
+
 let g:NERDSpaceDelims = 1
 let g:NERDDefaultAlign = 'left'
 
+let g:NERDTreeNodeDelimiter = "\u00a0"
 let NERDTreeMinimalUI = 1
 let NERDTreeShowHidden = 1
 
@@ -208,21 +218,16 @@ inoremap ˚ <Esc>:m .-2<CR>==gi
 vnoremap ∆ :m '>+1<CR>gv=gv
 vnoremap ˚ :m '<-2<CR>gv=gv
 
-nmap <silent> <C-h> <C-w>h
-nmap <silent> <C-j> <C-w>j
-nmap <silent> <C-k> <C-w>k
-nmap <silent> <C-l> <C-w>l
+nmap <C-h> <C-w>h
+nmap <C-j> <C-w>j
+nmap <C-k> <C-w>k
+nmap <C-l> <C-w>l
 
 map <Leader>k :Gstatus<CR>7+
 map <Leader>K :Gpush<CR>
 
 map <C-\> :NERDTreeToggle<CR>
 map <C-n> :NERDTreeFind<CR>
-
-" Use Alt-[ to navigate to previos tab
-nnoremap “ :tabprevious<CR>
-" Use Alt-] to navigate to next tab
-nnoremap ‘ :tabnext<CR>
 
 " Clear highlighting on double escape in normal mode
 nnoremap <silent> <Esc><Esc> :let @/=""<CR>
@@ -232,8 +237,18 @@ map <Leader>m :Vexplore db/migrate<CR>
 nnoremap S "_diwP
 vnoremap S "_dP
 
-" navigate to previos buffer
-nnoremap <Leader>b :e#<CR>
+" Buffers related mappings
+nnoremap <Leader>bb :buffers<CR>:buffer<Space>
+nnoremap <Leader>bd :bd<CR>
+nnoremap <Leader>q :BD<CR>
+
+nnoremap “ :bp<CR>
+nnoremap ‘ :bn<CR>
+
+" Use Alt-[ to navigate to previos tab
+" nnoremap ” :tabp<CR>
+" Use Alt-] to navigate to next tab
+" nnoremap ’ :tabn<CR>
 
 nnoremap gG :call GotoFirstEffectiveLine()<CR>
 
@@ -245,6 +260,8 @@ noremap <Left> <NOP>
 noremap <Right> <NOP>
 nnoremap Q <NOP>
 nnoremap q: <NOP>
+inoremap jk <ESC>
+nmap :q :<ESC>
 
 :command! Q q
 :command! W w
@@ -283,6 +300,9 @@ nmap <Leader>l :w<CR>:TestLast<CR>
 " convert `var_name = 'value'` to `let(:var_name) { 'value' }`
 nmap <Leader>ivl 0df@==ilet(<ESC>lxi:<ESC>ea)<ESC>wdwDA{<SPACE><ESC>p
 nmap <Leader>vl 0==ilet(<ESC>lxi:<ESC>ea)<ESC>wdwDA{<SPACE><ESC>p
+nmap <Leader>cl :'<,'>s/;//g<CR>^DAconsole.log(<ESC>pA;<ESC>F(l
+
+nmap <Leader>py <Esc>:w<CR>:!clear;python3 %<CR>
 
 nnoremap <silent> gs :Switch<cr>
 
