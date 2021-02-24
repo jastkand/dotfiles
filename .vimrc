@@ -50,6 +50,7 @@ Plug 'junegunn/fzf.vim', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'bogado/file-line'
 Plug 'neomake/neomake'
 Plug 'tpope/vim-projectionist'
+Plug 'tpope/vim-abolish'
 Plug 'AndrewRadev/switch.vim'
 Plug 'janko-m/vim-test'
 
