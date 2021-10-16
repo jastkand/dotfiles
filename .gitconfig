@@ -1,15 +1,10 @@
+[core]
+  editor = /usr/local/bin/vim
 [push]
-	default = simple
+  default = simple
 [alias]
-  st = status
-  d = diff --color-words
-  dw = diff --word-diff
-  ci = commit -v
-  cia = commit -v -a
-  ca = commit -a -m
-  co = checkout -b
-  cp = cherry-pick
-  l = log
-  ll = log -p
-  b = branch
   drop-commit = !sh -c 'git rebase -p --onto $0^ $0'
+[pull]
+  ff = only
+[init]
+  defaultBranch = main
