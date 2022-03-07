@@ -22,3 +22,13 @@ endsnippet
 snippet expac "expect action to change" b
 expect { action }.to change { $0 }
 endsnippet
+# Memoization
+snippet hashmem "hash memoization" b
+def ${1:method_name}(${2:value})
+	@$1 ||= Hash.new do |h, key|
+		h[key] = $0
+	end
+	@$1[$2]
+end
+endsnippet
+
