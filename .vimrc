@@ -89,7 +89,6 @@ filetype plugin on    " Enable filetype-specific plugins
 
 autocmd BufNewFile,BufRead *.vue set filetype=vue.html.javascript
 autocmd BufNewFile,BufRead *.html.erb set filetype=html.eruby
-autocmd BufNewFile,BufRead *.es6 set filetype=javascript
 autocmd BufNewFile,BufRead *.axlsx set filetype=ruby
 
 autocmd FileType ruby compiler ruby
