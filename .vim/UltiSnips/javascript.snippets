@@ -1,0 +1,36 @@
+snippet desc "describe block" b
+describe('$1', () => {
+	$0
+});
+endsnippet
+
+snippet it "it block" b
+it('$1', () => {
+	$0
+});
+endsnippet
+
+snippet bef "beforeEach block" b
+beforeEach(() => {
+	$0
+});
+endsnippet
+
+snippet aft "afterEach block" b
+afterEach(() => {
+	$0
+});
+endsnippet
+
+snippet exp "expect equal" b
+expect($1).toEqual($0);
+endsnippet
+
+snippet awt "await new Promise((resolve) => setTimeout(resolve));" b
+await new Promise((resolve) => setTimeout(resolve));
+endsnippet
+
+priority 10
+snippet cl "console.log" b
+console.log($0);
+endsnippet
