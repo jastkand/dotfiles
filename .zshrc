@@ -42,9 +42,7 @@ alias rdbmt='bundle exec rake db:migrate RAILS_ENV=test'
 alias rdbr='bundle exec rake db:rollback'
 alias rdbrt='bundle exec rake db:rollback RAILS_ENV=test'
 
-alias vim="/usr/local/bin/vim"
-alias vi="/usr/local/bin/vim"
-alias emacs="/usr/local/bin/emacs -nw"
+alias vi="$(which vim)"
 
 source $HOME/.profile
 
