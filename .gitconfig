@@ -1,5 +1,5 @@
 [core]
-  editor = /usr/local/bin/vim
+  editor = vim
 [push]
   default = simple
 [alias]
@@ -10,3 +10,5 @@
   defaultBranch = main
 [pager]
   branch = false
+[pack]
+	window = 1
