@@ -1,5 +1,8 @@
 zsh --version
 
+# Force reload the zsh. Fixes the issue in Fork.app when pre-commit cannot be run
+exec zsh
+
 # Hide computer name
 DEFAULT_USER=$USER
 prompt_context(){}
@@ -22,12 +25,14 @@ DISABLE_AUTO_UPDATE="false"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-plugins=(gem git redis-cli ruby ssh-agent zsh-syntax-highlighting docker-compose)
+plugins=(gem git redis-cli ruby ssh-agent zsh-syntax-highlighting docker-compose asdf)
 
 source $ZSH/oh-my-zsh.sh
 
 # Customize to your needs...
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games
+export PATH="/opt/homebrew/bin:$PATH"
+export PATH="/opt/homebrew/sbin:$PATH"
 
 alias lvh='rails s -p 3000 -b lvh.me'
 alias grlb='git branch --merged | grep -v "\*" | grep -v master | grep -v dev | xargs -n 1 git branch -d'
