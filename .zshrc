@@ -16,10 +16,6 @@ export ZSH=$HOME/.oh-my-zsh
 export TERM="xterm-256color"
 
 # Set name of the theme to load.
-# Look in ~/.oh-my-zsh/themes/
-# Optionally, if you set this to "random", it'll load a random theme each
-# time that oh-my-zsh is loaded.
-# ZSH_THEME="steeef"
 ZSH_THEME="agnoster"
 
 # Comment this out to disable bi-weekly auto-update checks
@@ -43,7 +39,6 @@ alias gss='git stash save'
 alias gsp='git stash pop'
 alias grm='git rebase master'
 alias rbe='PORT=3000 RAILS_MAX_THREADS=2 bundle exec puma -C config/puma.rb'
-alias piqf='yarn dev_webpack'
 alias rdbm='bundle exec rake db:migrate'
 alias rdbmt='bundle exec rake db:migrate RAILS_ENV=test'
 alias rdbr='bundle exec rake db:rollback'
