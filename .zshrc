@@ -1,7 +1,9 @@
 zsh --version
 
 # Force reload the zsh. Fixes the issue in Fork.app when pre-commit cannot be run
-exec zsh
+if [[ -z "$ZSH_VERSION" ]]; then
+  exec zsh
+fi
 
 # Hide computer name
 DEFAULT_USER=$USER
