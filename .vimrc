@@ -47,7 +47,7 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'tmhedberg/matchit'
 Plug 'romainl/vim-qf'
 Plug 'AndrewRadev/splitjoin.vim'
-Plug 'mileszs/ack.vim'
+Plug 'dyng/ctrlsf.vim'
 Plug 'posva/vim-vue'
 Plug 'othree/html5.vim'
 Plug 'pangloss/vim-javascript'
@@ -75,10 +75,14 @@ let g:airline#extensions#tabline#show_tab_type = 0
 let g:airline#extensions#tabline#show_close_button = 0
 
 let g:neomake_ruby_enabled_makers = ['mri']
-
-let g:neomake_ruby_enabled_makers = ['mri']
 let g:neomake_ruby_rubocop_exe = 'bundle'
 let g:neomake_ruby_rubocop_args = ['exec', 'rubocop']
+
+let g:ctrlsf_context = '-B 2 -A 2'
+let g:ctrlsf_default_view_mode = 'compact'
+let g:ctrlsf_auto_focus = {
+    \ "at": "start"
+    \ }
 
 " autocmd! BufWritePost * Neomake
 " autocmd! BufReadPost * Neomake
@@ -110,7 +114,7 @@ endfunction
 let mapleader=" "
 
 " fzf configuration
-set rtp+=/usr/local/opt/fzf
+set rtp+=/opt/homebrew/opt/fzf
 
 " Indent based on previous line
 set autoindent
@@ -189,11 +193,6 @@ if has('gui_running')
   set guioptions=egmrt  " hide the gui menubar
 endif
 
-" The Silver Searcher
-if executable('ag')
-  let g:ackprg = 'ag --vimgrep --nogroup --nocolor'
-endif
-
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
@@ -201,10 +200,10 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:neoterm_position = 'horizontal'
 
 " bind K to grep word under cursor
-nnoremap K :Ack! "\b<C-R><C-W>\b"<CR>:cw<CR>
+nnoremap K :CtrlSF<CR>
 
 " find in project
-nnoremap <Leader>\ :Ack!<SPACE>
+nnoremap <Leader>\ :CtrlSF<SPACE>
 
 " Strip whitespaces on save
 autocmd BufWritePre * StripWhitespace
