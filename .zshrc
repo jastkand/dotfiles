@@ -37,7 +37,7 @@ alias grlb='git branch --merged | grep -v "\*" | grep -v master | grep -v dev | 
 alias gfp='git fetch -p && git pull'
 alias gss='git stash save'
 alias gsp='git stash pop'
-alias grm='git rebase master'
+alias grm='git rebase $(git remote show origin | sed -n "/HEAD branch/s/.*: //p")'
 alias rbe='PORT=3000 RAILS_MAX_THREADS=2 bundle exec puma -C config/puma.rb'
 alias rdbm='bundle exec rake db:migrate'
 alias rdbmt='bundle exec rake db:migrate RAILS_ENV=test'
