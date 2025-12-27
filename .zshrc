@@ -32,18 +32,14 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/usr/bin:/sbin:/bi
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/opt/homebrew/sbin:$PATH"
 
-alias lvh='rails s -p 3000 -b lvh.me'
 alias grlb='git branch --merged | grep -v "\*" | grep -v master | grep -v dev | xargs -n 1 git branch -d'
 alias gfp='git fetch -p && git pull'
 alias gss='git stash save'
 alias gsp='git stash pop'
 alias grm='git rebase $(git remote show origin | sed -n "/HEAD branch/s/.*: //p")'
-alias rbe='PORT=3000 RAILS_MAX_THREADS=2 bundle exec puma -C config/puma.rb'
-alias rdbm='bundle exec rake db:migrate'
-alias rdbmt='bundle exec rake db:migrate RAILS_ENV=test'
-alias rdbr='bundle exec rake db:rollback'
-alias rdbrt='bundle exec rake db:rollback RAILS_ENV=test'
+alias gcem='gc --allow-empty -m "bump"'
 
+alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
 alias vi="$(which vim)"
 
 source $HOME/.profile
@@ -54,3 +50,5 @@ source $HOME/.profile
 # --follow: Follow symlinks
 # --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
+
+PROMPT='%{$fg[yellow]%}[%D{%H:%M:%S}] '$PROMPT
