@@ -30,11 +30,11 @@ install-git:
 	@cp ./.gitignore_global ~/.gitignore_global
 	@git config --global core.excludesfile ~/.gitignore_global
 
+# ~/.vim is deliberately left alone: vim-plug installs itself to ~/.vim/autoload and its
+# plugins to ~/.vim/bundle, and the old `rm -rf ~/.vim` deleted both on every run. .vimrc
+# bootstraps plug.vim by itself when it is missing.
 install-vim:
-	@rm -f ~/.vimrc
-	@rm -rf ~/.vim
 	@cp ./.vimrc ~/.vimrc
-	@cp -R ./.vim ~/.vim
 
 # Statusline + /my-usage. Leaves ~/.claude/statusline.conf alone (opt-in, see
 # claude/statusline.conf.example) and patches only the statusLine key in settings.json.
