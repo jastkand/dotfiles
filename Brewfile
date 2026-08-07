@@ -31,7 +31,6 @@ cask "font-jetbrains-mono"
 #   brew install --cask --adopt iterm2
 #
 # cask "iterm2"               # README: gruvbox preset, Natural Text Editing
-# cask "bettertouchtool"      # jastkand-btt-preset.bttpreset, btt-scripts/
 # cask "vlc"                  # the vlc alias in .zshrc
 #
 # Not here on purpose: oh-my-zsh and zsh-syntax-highlighting (installed by their own
