@@ -2,3 +2,6 @@
 .DS_Store
 tags
 !tags/
+
+# Personal per-project Claude statusline config (see dotfiles claude/statusline.conf.example)
+**/.claude/statusline.conf

@@ -1,0 +1,20 @@
+# Optional ticket extension for claude/statusline.sh.
+#
+# Copy to one of these, whichever scope fits:
+#   <repo>/.claude/statusline.conf   per project — wins over the machine default
+#   ~/.claude/statusline.conf        machine-wide fallback
+#
+# With no such file anywhere, the statusline simply omits the ticket segment.
+# Parsed as KEY=VALUE, never sourced.
+
+# Issue key prefix to look for in the session name and git branch, case-insensitively.
+# A branch like `feature/proj-1234-add-thing` renders as PROJ-1234.
+TICKET_PREFIX=PROJ
+
+# Optional. Makes the ticket id a clickable OSC 8 hyperlink; {ticket} is replaced
+# with the detected id. Drop this line to show the bare id instead.
+TICKET_URL=https://linear.app/your-workspace/issue/{ticket}
+
+# Jira example:
+# TICKET_PREFIX=ENG
+# TICKET_URL=https://your-org.atlassian.net/browse/{ticket}
