@@ -1,12 +1,20 @@
 ## Install
 
 ```sh
-make            # vim + claude + git
+make bootstrap      # fresh machine: brew packages, then configs
+make                # configs only (vim + claude + git)
 make install-claude
 make install-git    # ~/.gitignore_global only; ~/.gitconfig is left alone,
                     # since identity, gpg and lfs settings are machine-local
+make check-brew     # what the Brewfile wants that is not installed yet
+make install-brew   # installs only what is missing, never upgrades
 make test
 ```
+
+`Brewfile` lists the tools these configs assume — nothing is version-pinned there, and
+there is no `.tool-versions`: asdf keeps runtime versions in each project. GUI apps and
+fonts are listed but commented out, since brew will not take over an app installed by
+hand; see the notes in the file.
 
 ## Claude Code
 

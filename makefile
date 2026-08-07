@@ -1,6 +1,9 @@
 CLAUDE_DIR ?= $(HOME)/.claude
 
-.PHONY: install install-vim install-claude install-git test test-claude
+.PHONY: bootstrap install install-vim install-claude install-git install-brew check-brew test test-claude
+
+# Fresh machine: packages first, then the configs that depend on them.
+bootstrap: install-brew install
 
 install: install-vim install-claude install-git
 
@@ -8,6 +11,18 @@ test: test-claude
 
 test-claude:
 	@sh ./claude/statusline_test.sh
+
+# --no-upgrade: install what is missing, never touch what is already there. Without it
+# brew bundle treats "installed but outdated" as unsatisfied and upgrades it, which turns
+# this into an unrelated system upgrade. Upgrading stays a deliberate `brew upgrade`.
+install-brew:
+	@command -v brew >/dev/null 2>&1 || { echo "brew not found: https://brew.sh"; exit 1; }
+	@brew bundle install --no-upgrade --file=./Brewfile
+
+# Non-destructive: lists what the Brewfile wants that is not installed yet.
+check-brew:
+	@command -v brew >/dev/null 2>&1 || { echo "brew not found: https://brew.sh"; exit 1; }
+	@brew bundle check --no-upgrade --file=./Brewfile --verbose
 
 # Only the global ignore file. ~/.gitconfig is deliberately left alone: identity,
 # gpg and lfs settings live there and exist only on the machine.
