@@ -4,8 +4,9 @@
 make bootstrap      # fresh machine: brew packages, then configs
 make                # configs only (vim + claude + git)
 make install-claude
-make install-git    # ~/.gitignore_global only; ~/.gitconfig is left alone,
-                    # since identity, gpg and lfs settings are machine-local
+make install-git    # ~/.gitignore_global, plus an include.path entry so this repo's
+                    # .gitconfig applies. ~/.gitconfig itself is never overwritten:
+                    # identity, gpg and lfs settings are machine-local
 make check-brew     # what the Brewfile wants that is not installed yet
 make install-brew   # installs only what is missing, never upgrades
 make test

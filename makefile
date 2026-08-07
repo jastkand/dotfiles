@@ -24,11 +24,15 @@ check-brew:
 	@command -v brew >/dev/null 2>&1 || { echo "brew not found: https://brew.sh"; exit 1; }
 	@brew bundle check --no-upgrade --file=./Brewfile --verbose
 
-# Only the global ignore file. ~/.gitconfig is deliberately left alone: identity,
-# gpg and lfs settings live there and exist only on the machine.
+# ~/.gitconfig is never overwritten: identity, gpg and lfs settings live there and exist
+# only on the machine. Instead this repo's .gitconfig is pulled in via include.path, so
+# the settings here actually apply while the machine-local ones stay put. The include is
+# appended, so values here win over anything set earlier in ~/.gitconfig.
 install-git:
 	@cp ./.gitignore_global ~/.gitignore_global
 	@git config --global core.excludesfile ~/.gitignore_global
+	@git config --global --get-all include.path 2>/dev/null | grep -qxF "$(CURDIR)/.gitconfig" \
+		|| git config --global --add include.path "$(CURDIR)/.gitconfig"
 
 # ~/.vim is deliberately left alone: vim-plug installs itself to ~/.vim/autoload and its
 # plugins to ~/.vim/bundle, and the old `rm -rf ~/.vim` deleted both on every run. .vimrc
