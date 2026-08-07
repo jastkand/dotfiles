@@ -2,6 +2,10 @@
 .DS_Store
 tags
 !tags/
+.vscode
+.prettierrc
+.vim/
 
-# Personal per-project Claude statusline config (see dotfiles claude/statusline.conf.example)
+# Personal per-project Claude config (see dotfiles claude/statusline.conf.example)
+**/.claude/settings.local.json
 **/.claude/statusline.conf

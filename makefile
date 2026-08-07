@@ -1,13 +1,19 @@
 CLAUDE_DIR ?= $(HOME)/.claude
 
-.PHONY: install install-vim install-claude test test-claude
+.PHONY: install install-vim install-claude install-git test test-claude
 
-install: install-vim install-claude
+install: install-vim install-claude install-git
 
 test: test-claude
 
 test-claude:
 	@sh ./claude/statusline_test.sh
+
+# Only the global ignore file. ~/.gitconfig is deliberately left alone: identity,
+# gpg and lfs settings live there and exist only on the machine.
+install-git:
+	@cp ./.gitignore_global ~/.gitignore_global
+	@git config --global core.excludesfile ~/.gitignore_global
 
 install-vim:
 	@rm -f ~/.vimrc

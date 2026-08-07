@@ -1,7 +1,17 @@
+## Install
+
+```sh
+make            # vim + claude + git
+make install-claude
+make install-git    # ~/.gitignore_global only; ~/.gitconfig is left alone,
+                    # since identity, gpg and lfs settings are machine-local
+make test
+```
+
 ## Claude Code
 
 ```sh
-make install-claude   # or `make install` for vim + claude
+make install-claude
 ```
 
 Copies into `~/.claude/`:
