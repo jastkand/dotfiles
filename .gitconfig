@@ -3,7 +3,7 @@
 [push]
   default = simple
 [alias]
-  drop-commit = !sh -c 'git rebase -p --onto $0^ $0'
+  drop-commit = !sh -c 'git rebase --rebase-merges --onto $0^ $0'
 [pull]
   ff = only
 [init]
