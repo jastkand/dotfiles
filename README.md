@@ -12,9 +12,9 @@ make test
 ```
 
 `Brewfile` lists the tools these configs assume — nothing is version-pinned there, and
-there is no `.tool-versions`: asdf keeps runtime versions in each project. GUI apps and
-fonts are listed but commented out, since brew will not take over an app installed by
-hand; see the notes in the file.
+there is no `.tool-versions`: asdf keeps runtime versions in each project. GUI apps are
+listed but commented out, since brew will not take over an app installed by hand; see the
+notes in the file.
 
 ## Claude Code
 
@@ -76,11 +76,17 @@ Plugin for highlighting command: https://github.com/zsh-users/zsh-syntax-highlig
 
 ## Agnoster theme
 
-Powerline fonts repo: https://github.com/powerline/fonts
+Font — JetBrains Mono (https://github.com/JetBrains/JetBrainsMono), installed by the
+Brewfile, or on its own:
 
-JetBrainsMono: https://github.com/JetBrains/JetBrainsMono
+```sh
+brew install --cask font-jetbrains-mono
+```
 
-FiraMono Powerline font: https://github.com/powerline/fonts/tree/master/FiraMono
+Then pick it in iTerm: CMD+i -> Text -> Font.
+
+Alternatives: Powerline fonts (https://github.com/powerline/fonts), of which
+FiraMono (https://github.com/powerline/fonts/tree/master/FiraMono).
 
 Gruvbox: https://github.com/morhetz/gruvbox
 

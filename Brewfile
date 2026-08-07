@@ -16,16 +16,22 @@ brew "fzf"
 brew "asdf"      # runtime versions stay in each project's own .tool-versions
 brew "coreutils"
 
-# GUI apps and fonts this repo configures. Left commented because they are already
-# installed by hand on this machine, and brew refuses to overwrite a non-brew app —
-# uncommenting would make `make install-brew` fail here.
+# The powerline font the agnoster theme and iTerm profile expect.
+# https://github.com/JetBrains/JetBrainsMono
+# If JetBrainsMono-*.ttf were already dropped into ~/Library/Fonts by hand, brew will
+# refuse to link over them. Clear the hand-installed copies first, or adopt them:
+#   brew install --cask --adopt font-jetbrains-mono
+cask "font-jetbrains-mono"
+
+# GUI apps this repo configures. Left commented because they are already installed by
+# hand on this machine, and brew refuses to take over a non-brew app — uncommenting
+# would make `make install-brew` fail here.
 #
 # On a fresh machine, uncomment. To hand an existing manual install over to brew:
 #   brew install --cask --adopt iterm2
 #
 # cask "iterm2"               # README: gruvbox preset, Natural Text Editing
 # cask "bettertouchtool"      # jastkand-btt-preset.bttpreset, btt-scripts/
-# cask "font-jetbrains-mono"  # README: powerline font for the agnoster theme
 # cask "vlc"                  # the vlc alias in .zshrc
 #
 # Not here on purpose: oh-my-zsh and zsh-syntax-highlighting (installed by their own
