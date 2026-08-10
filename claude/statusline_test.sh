@@ -149,6 +149,51 @@ is "session_name is preferred over the branch" \
   "Opus 5 (high) | repo | feature/proj-1234-add-thing | $(link https://tracker.example/PROJ-9999 PROJ-9999)" \
   "$(render '{"model":{"display_name":"Opus 5"},"workspace":{"current_dir":"'"$repo"'"},"session_name":"PROJ-9999 hotfix","effort":{"level":"high"}}')"
 
+# ---- linked worktrees -------------------------------------------------------
+
+# `git worktree add` populates only tracked files, and statusline.conf is typically
+# gitignored, so in a worktree the conf lives one level up in the main checkout.
+echo "linked worktrees"
+
+wt="$tmp/wt"
+wt_conf="$wt/.claude/statusline.conf"
+git -C "$repo" worktree add -q "$wt" -b wt-proj-4321
+mkdir -p "$wt/.claude"
+payload_wt='{"model":{"display_name":"Opus 5"},"workspace":{"current_dir":"'"$wt"'"}}'
+wt_line="Opus 5 | wt | wt-proj-4321"
+
+no_conf
+rm -f "$wt_conf"
+is "worktree with no conf anywhere: no ticket segment" \
+  "$wt_line" "$(render "$payload_wt")"
+
+printf 'TICKET_PREFIX=PROJ\nTICKET_URL=https://repo.example/browse/{ticket}\n' > "$repo_conf"
+is "worktree finds the conf in the main checkout" \
+  "$wt_line | $(link https://repo.example/browse/PROJ-4321 PROJ-4321)" \
+  "$(render "$payload_wt")"
+
+printf 'TICKET_PREFIX=PROJ\nTICKET_URL=https://wt.example/{ticket}\n' > "$wt_conf"
+is "a conf inside the worktree wins over the main checkout" \
+  "$wt_line | $(link https://wt.example/PROJ-4321 PROJ-4321)" \
+  "$(render "$payload_wt")"
+
+rm -f "$wt_conf" "$repo_conf"
+printf 'TICKET_PREFIX=PROJ\nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+is "worktree still falls through to the global conf" \
+  "$wt_line | $(link https://tracker.example/PROJ-4321 PROJ-4321)" \
+  "$(render "$payload_wt")"
+
+# The main checkout must not start reading its own path through the worktree branch.
+no_conf
+printf 'TICKET_PREFIX=PROJ\nTICKET_URL=https://repo.example/browse/{ticket}\n' > "$repo_conf"
+is "the main checkout is unaffected by the worktree lookup" \
+  "$base_line | $(link https://repo.example/browse/PROJ-1234 PROJ-1234)" \
+  "$(render "$payload_repo")"
+
+git -C "$repo" worktree remove --force "$wt"
+no_conf
+printf 'TICKET_PREFIX=PROJ\nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+
 # A conf is data, never code: dropping into an untrusted repo must not run anything.
 printf 'TICKET_PREFIX=PROJ\nTICKET_URL=https://tracker.example/{ticket}\nEVIL=$(touch %s/pwned)\n`touch %s/pwned2`\n' "$tmp" "$tmp" > "$repo_conf"
 render "$payload_repo" >/dev/null

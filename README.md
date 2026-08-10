@@ -54,8 +54,14 @@ anywhere. To turn it on, copy `claude/statusline.conf.example` to either scope:
 
 | Path | Scope |
 | --- | --- |
-| `<repo>/.claude/statusline.conf` | per project — wins over the machine default |
+| `<repo>/.claude/statusline.conf` | per project — wins over everything below |
+| `<main checkout>/.claude/statusline.conf` | reached from inside a linked worktree |
 | `~/.claude/statusline.conf` | machine-wide fallback |
+
+The middle row matters because `git worktree add` only populates tracked files, and this
+config is usually gitignored — so a worktree starts without one and would otherwise show no
+ticket at all. The lookup falls back to the main checkout via `git rev-parse --git-common-dir`,
+while a conf placed inside the worktree still wins if you want to override it there.
 
 ```sh
 TICKET_PREFIX=PROJ

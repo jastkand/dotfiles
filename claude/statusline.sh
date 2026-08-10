@@ -6,7 +6,8 @@
 # nothing else changes. See statusline.conf.example for the format. Lookup order:
 #   1. $CLAUDE_STATUSLINE_TICKET_PREFIX / $CLAUDE_STATUSLINE_TICKET_URL from the environment
 #   2. <git repo root>/.claude/statusline.conf   (or <cwd>/.claude/... outside a repo)
-#   3. ~/.claude/statusline.conf                 (machine-wide default)
+#   3. <main checkout>/.claude/statusline.conf   (only differs inside a linked worktree)
+#   4. ~/.claude/statusline.conf                 (machine-wide default)
 # The first source that yields a prefix wins; conf files are parsed as KEY=VALUE, never
 # sourced, so dropping into an untrusted repo cannot execute anything.
 #
@@ -55,9 +56,19 @@ base=""
 
 branch=""
 repo_root=""
+main_root=""
 if [ -n "$cwd" ]; then
   branch=$(git -C "$cwd" --no-optional-locks branch --show-current 2>/dev/null)
   repo_root=$(git -C "$cwd" --no-optional-locks rev-parse --show-toplevel 2>/dev/null)
+  # Inside a linked worktree --show-toplevel is the worktree itself, which is created
+  # without untracked files -- and statusline.conf is routinely gitignored, so it lives
+  # only in the main checkout. --git-common-dir points at the main .git, and is absolute
+  # exactly when the cwd is a linked worktree; from the main checkout it comes back
+  # relative (".git", "../.git") and is skipped, since repo_root already covers that.
+  common_dir=$(git -C "$cwd" --no-optional-locks rev-parse --git-common-dir 2>/dev/null)
+  case "$common_dir" in
+    /*) main_root=$(dirname "$common_dir") ;;
+  esac
 fi
 
 # Read one KEY from a KEY=VALUE conf file. Blank lines, # comments, surrounding
@@ -69,16 +80,24 @@ conf_get() {
     | sed -e 's/[[:space:]]*$//' -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'\$/\1/"
 }
 
+# Take TICKET_PREFIX from the first conf that defines one, and the URL from that same
+# file so a half-configured conf cannot borrow the next one's link target. Written as
+# calls rather than a `for` list because the worktree candidate is conditional, and an
+# unquoted optional element would split a path containing spaces.
+load_conf() {
+  [ -n "$ticket_prefix" ] && return 0
+  found=$(conf_get TICKET_PREFIX "$1")
+  [ -n "$found" ] || return 0
+  ticket_prefix="$found"
+  ticket_url_tpl=$(conf_get TICKET_URL "$1")
+}
+
 ticket_prefix="$CLAUDE_STATUSLINE_TICKET_PREFIX"
 ticket_url_tpl="$CLAUDE_STATUSLINE_TICKET_URL"
 if [ -z "$ticket_prefix" ]; then
-  for conf in "${repo_root:-$cwd}/.claude/statusline.conf" "$HOME/.claude/statusline.conf"; do
-    ticket_prefix=$(conf_get TICKET_PREFIX "$conf")
-    if [ -n "$ticket_prefix" ]; then
-      ticket_url_tpl=$(conf_get TICKET_URL "$conf")
-      break
-    fi
-  done
+  load_conf "${repo_root:-$cwd}/.claude/statusline.conf"
+  [ -n "$main_root" ] && load_conf "$main_root/.claude/statusline.conf"
+  load_conf "$HOME/.claude/statusline.conf"
 fi
 
 # Find a <PREFIX>-<number> ticket, preferring the session name over the branch.
