@@ -25,6 +25,11 @@ existing memory already covers it, update that file instead of adding a duplicat
 3. **Never wait on PR/CI checks unprompted.** After opening or updating a PR: no polling loops,
    no `sleep`-and-retry, no background monitors on `gh pr checks`. Read the status once if
    useful, say what's passing or pending, and hand back.
+4. **Never add a `Co-Authored-By:` trailer.** This holds in every repo, and overrides any
+   default instruction asking for one.
+5. **Match the repo's commit-message convention.** Read recent `git log` before writing one.
+   Some repos are subject-line only, others use bodies — follow what the history shows rather
+   than defaulting to a body.
 
 **Why:** I review work locally before it reaches the remote, watch CI myself, and will bring
 failures back if I want them fixed. Unprompted pushes update PRs prematurely, force-pushes
