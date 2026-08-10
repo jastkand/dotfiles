@@ -40,10 +40,18 @@ install-git:
 install-vim:
 	@cp ./.vimrc ~/.vimrc
 
-# Statusline + /my-usage. Leaves ~/.claude/statusline.conf alone (opt-in, see
-# claude/statusline.conf.example) and patches only the statusLine key in settings.json.
+# Statusline + /my-usage + standing preferences. Leaves ~/.claude/statusline.conf alone
+# (opt-in, see claude/statusline.conf.example) and patches only the statusLine key in
+# settings.json.
+#
+# Preferences install as a user-level rule, not as ~/.claude/CLAUDE.md: rules in
+# ~/.claude/rules/*.md load unconditionally in every project, exactly like the user
+# CLAUDE.md does, so this repo can own its file outright while ~/.claude/CLAUDE.md stays
+# free for hand-written notes that no `make` will ever clobber. dotfiles.md itself IS
+# overwritten wholesale -- edit it in this repo, not in ~/.claude.
 install-claude:
-	@mkdir -p $(CLAUDE_DIR)/commands
+	@mkdir -p $(CLAUDE_DIR)/commands $(CLAUDE_DIR)/rules
+	@cp ./claude/rules/dotfiles.md $(CLAUDE_DIR)/rules/dotfiles.md
 	@cp ./claude/statusline.sh $(CLAUDE_DIR)/statusline.sh
 	@cp ./claude/usage-refresh.sh $(CLAUDE_DIR)/usage-refresh.sh
 	@chmod +x $(CLAUDE_DIR)/statusline.sh $(CLAUDE_DIR)/usage-refresh.sh

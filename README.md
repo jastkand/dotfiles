@@ -25,12 +25,27 @@ make install-claude
 
 Copies into `~/.claude/`:
 
+- `rules/dotfiles.md` — standing preferences, loaded into every session in every project
 - `statusline.sh` — `<model> (<effort>) | <dir> | <branch> | <ticket> | <usage>`
 - `usage-refresh.sh` — background helper caching `/usage` into `~/.claude/usage-cache.json`
 - `commands/my-usage.md` — `/my-usage`, reads that cache and reports subscription limits
 
 `settings.json` is not overwritten: only its `statusLine` key is patched in with `jq`, so
 `model`, `theme`, `effortLevel` and `enabledPlugins` stay machine-local. Requires `jq`.
+
+### Standing preferences
+
+`claude/rules/dotfiles.md` holds the rules that should hold everywhere — git/PR etiquette, `gh`
+over the GitHub MCP tools, never reading or inlining secrets, and what `- kapish?` means.
+
+It installs to `~/.claude/rules/dotfiles.md`. User-level rules load unconditionally in every
+project, the same as `~/.claude/CLAUDE.md` would, but keep the two concerns apart: this file is
+**overwritten wholesale** on every `make install-claude` (edit it here, not there), while
+`~/.claude/CLAUDE.md` is never written by this repo and stays free for machine-local notes.
+Rules that only apply to one codebase belong in that repo's own `CLAUDE.md`.
+
+Not to be confused with `~/.claude/projects/<project>/memory/`: those files are per-project,
+written by Claude as it works, and not managed by this repo.
 
 ### Ticket extension (opt-in)
 
