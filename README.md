@@ -2,11 +2,13 @@
 
 ```sh
 make bootstrap      # fresh machine: brew packages, then configs
-make                # configs only (vim + claude + git)
+make                # configs only (vim + claude + git + zsh)
 make install-claude
 make install-git    # ~/.gitignore_global, plus an include.path entry so this repo's
                     # .gitconfig applies. ~/.gitconfig itself is never overwritten:
                     # identity, gpg and lfs settings are machine-local
+make install-zsh    # a ~/.zshrc that sources this repo's .zshrc. Same idea: ~/.zshrc
+                    # itself is never overwritten, tool installers keep appending to it
 make check-brew     # what the Brewfile wants that is not installed yet
 make install-brew   # installs only what is missing, never upgrades
 make test
@@ -89,6 +91,42 @@ repo, covering the config precedence chain, every incomplete-config case, and `p
 It touches nothing outside its temp dir.
 
 ## ZSH
+
+```sh
+make install-zsh
+```
+
+`~/.zshrc` is never overwritten -- for the same reason `~/.gitconfig` is not. Tool
+installers (asdf, bun, LM Studio, the odd `curl | sh`) append their own blocks to it, and
+those are machine-local by nature: they hardcode paths that exist on one machine. Fighting
+that with a copied file means losing those blocks on every `make`.
+
+So `~/.zshrc` becomes a stub whose real job is to pull in this repo's `.zshrc`:
+
+```zsh
+source /path/to/dotfiles/.zshrc
+
+# machine-local below: PATH entries, tool installer blocks, one-off aliases
+export PATH="$PATH:$HOME/.lmstudio/bin"
+```
+
+Because installers always *append*, whatever they add lands after the sourced config and
+still applies. Drift collects in the stub instead of diverging from the repo copy.
+
+The target only creates the stub when `~/.zshrc` is missing, and otherwise checks that the
+`source` line is there. An existing full `~/.zshrc` -- one that sources oh-my-zsh itself --
+stops the target with instructions rather than being appended to, since sourcing oh-my-zsh
+twice re-runs the prompt setup. Migrating is a one-time manual edit: keep the machine-local
+lines, move anything worth having everywhere into this repo's `.zshrc`, and put the
+`source` line above the rest.
+
+### Git branch and worktree helpers
+
+`gwbd [-f] <branch>...` deletes branches that are checked out in a worktree, which plain
+`git branch -D` refuses to do -- it removes each branch's worktree first, then deletes them
+all in one `git branch -D`. A worktree holding uncommitted or untracked files is left alone
+unless `-f` is given; a worktree whose directory was deleted by hand is pruned. The branch
+of the main worktree, and any worktree you are currently standing in, are never touched.
 
 Install guide: https://github.com/robbyrussell/oh-my-zsh
 

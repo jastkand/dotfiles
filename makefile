@@ -1,11 +1,11 @@
 CLAUDE_DIR ?= $(HOME)/.claude
 
-.PHONY: bootstrap install install-vim install-claude install-git install-brew check-brew test test-claude
+.PHONY: bootstrap install install-vim install-claude install-git install-zsh install-brew check-brew test test-claude
 
 # Fresh machine: packages first, then the configs that depend on them.
 bootstrap: install-brew install
 
-install: install-vim install-claude install-git
+install: install-vim install-claude install-git install-zsh
 
 test: test-claude
 
@@ -39,6 +39,29 @@ install-git:
 # bootstraps plug.vim by itself when it is missing.
 install-vim:
 	@cp ./.vimrc ~/.vimrc
+
+# ~/.zshrc is never overwritten, for the same reason ~/.gitconfig is not: tool installers
+# (asdf, bun, LM Studio, ...) append their own blocks to it, and those are machine-local by
+# nature. Instead ~/.zshrc becomes a stub that sources this repo's .zshrc, and since
+# installers always append, whatever they add lands after it and still applies.
+#
+# A ~/.zshrc that is still a full config would source oh-my-zsh twice and re-run the prompt
+# setup, so that case stops here with instructions rather than quietly breaking the shell.
+install-zsh:
+	@if [ ! -e $(HOME)/.zshrc ]; then \
+		printf 'source %s/.zshrc\n' "$(CURDIR)" > $(HOME)/.zshrc; \
+		echo "created ~/.zshrc sourcing $(CURDIR)/.zshrc"; \
+	elif ! grep -qF '$(CURDIR)/.zshrc' $(HOME)/.zshrc; then \
+		echo "~/.zshrc exists and does not source $(CURDIR)/.zshrc."; \
+		echo "Keep only the machine-local lines in it -- PATH entries and blocks written by"; \
+		echo "tool installers -- and put this line above them:"; \
+		echo ""; \
+		echo "    source $(CURDIR)/.zshrc"; \
+		echo ""; \
+		echo "Anything in ~/.zshrc worth having on every machine belongs in this repo's"; \
+		echo ".zshrc instead. See the ZSH section of README.md."; \
+		exit 1; \
+	fi
 
 # Statusline + /my-usage + standing preferences. Leaves ~/.claude/statusline.conf alone
 # (opt-in, see claude/statusline.conf.example) and patches only the statusLine key in
