@@ -39,6 +39,54 @@ alias gsp='git stash pop'
 alias grm='git rebase $(git remote show origin | sed -n "/HEAD branch/s/.*: //p")'
 alias gcem='gc --allow-empty -m "bump"'
 
+# gwbd <branch>... -- delete branches, including ones checked out in a worktree.
+# `git branch -D` refuses those and only tells you the path, so remove the worktree first
+# and then delegate the deletion. A worktree with uncommitted or untracked files is left
+# alone unless -f is given: losing that work is worse than a second run of the command.
+gwbd() {
+  emulate -L zsh
+  local -a force
+  while [[ $1 == -* ]]; do
+    case $1 in
+      -f|--force) force=(--force); shift ;;
+      --) shift; break ;;
+      *) print -u2 "gwbd: unknown option: $1"; return 1 ;;
+    esac
+  done
+  (( $# )) || { print -u2 "usage: gwbd [-f] <branch>..."; return 1 }
+  git rev-parse --git-dir >/dev/null || return
+
+  # Map branch -> worktree path. In the porcelain format every worktree is a record
+  # starting with "worktree <path>", holding a "branch refs/heads/<name>" line unless it
+  # is detached; the first record is always the main one, which cannot be removed.
+  local -A worktrees
+  # not `local path`: that shadows the special array zsh keeps tied to $PATH.
+  local line wtpath main
+  while IFS= read -r line; do
+    case $line in
+      worktree\ *) wtpath=${line#worktree }; : ${main:=$wtpath} ;;
+      branch\ refs/heads/*) worktrees[${line#branch refs/heads/}]=$wtpath ;;
+    esac
+  done < <(git worktree list --porcelain)
+
+  local branch dir here=${PWD:A}
+  for branch in "$@"; do
+    dir=${worktrees[$branch]}
+    [[ -n $dir ]] || continue
+    if [[ $dir == $main ]]; then
+      print -u2 "gwbd: $branch is checked out in the main worktree, leaving $dir alone"
+    elif [[ $here == ${dir:A} || $here == ${dir:A}/* ]]; then
+      print -u2 "gwbd: you are inside $dir -- cd out of it first"
+    elif [[ ! -d $dir ]]; then
+      git worktree prune   # directory already gone by hand, just drop the registration
+    elif ! git worktree remove $force "$dir"; then
+      (( $#force )) || print -u2 "gwbd: rerun with -f to remove $dir anyway"
+    fi
+  done
+
+  git branch -D "$@"
+}
+
 alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
 alias vi="$(which vim)"
 
