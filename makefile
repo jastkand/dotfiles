@@ -1,5 +1,10 @@
 CLAUDE_DIR ?= $(HOME)/.claude
 
+# Without this a bare `make` would run whatever target happens to come first, which is
+# bootstrap -- and bootstrap reaches for brew. Plain `make` stays the harmless one: it
+# only lays down configs, and installing packages stays a deliberate `make bootstrap`.
+.DEFAULT_GOAL := install
+
 .PHONY: bootstrap install install-vim install-claude install-git install-zsh install-brew check-brew test test-claude
 
 # Fresh machine: packages first, then the configs that depend on them.
