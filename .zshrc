@@ -87,6 +87,13 @@ gwbd() {
   git branch -D "$@"
 }
 
+alias lvh='rails s -p 3000 -b lvh.me'
+alias rbe='PORT=3000 RAILS_MAX_THREADS=2 bundle exec puma -C config/puma.rb'
+alias rdbm='bundle exec rake db:migrate'
+alias rdbmt='bundle exec rake db:migrate RAILS_ENV=test'
+alias rdbr='bundle exec rake db:rollback'
+alias rdbrt='bundle exec rake db:rollback RAILS_ENV=test'
+
 alias vlc='/Applications/VLC.app/Contents/MacOS/VLC'
 alias vi="$(which vim)"
 
