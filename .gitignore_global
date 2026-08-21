@@ -9,4 +9,5 @@ tags
 # Personal per-project Claude config (see dotfiles claude/statusline.conf.example)
 **/.claude/settings.local.json
 **/.claude/statusline.conf
+**/.claude/worktrees/
 **/.mcp.json
