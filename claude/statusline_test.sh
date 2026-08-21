@@ -149,6 +149,54 @@ is "session_name is preferred over the branch" \
   "Opus 5 (high) | repo | feature/proj-1234-add-thing | $(link https://tracker.example/PROJ-9999 PROJ-9999)" \
   "$(render '{"model":{"display_name":"Opus 5"},"workspace":{"current_dir":"'"$repo"'"},"session_name":"PROJ-9999 hotfix","effort":{"level":"high"}}')"
 
+# ---- several prefixes at once -----------------------------------------------
+
+echo "ticket extension: comma-separated prefixes"
+
+# render_session <session name> -- same repo payload, with a session name attached.
+render_session() {
+  render '{"model":{"display_name":"Opus 5"},"workspace":{"current_dir":"'"$repo"'"},"session_name":"'"$1"'"}'
+}
+session_line="Opus 5 | repo | feature/proj-1234-add-thing"
+
+printf 'TICKET_PREFIX=NOPE,PROJ\nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+is "a later prefix in the list still matches" \
+  "$base_line | $(link https://tracker.example/PROJ-1234 PROJ-1234)" \
+  "$(render "$payload_repo")"
+
+printf 'TICKET_PREFIX= proj , nope \nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+is "whitespace around list elements is tolerated" \
+  "$base_line | $(link https://tracker.example/PROJ-1234 PROJ-1234)" \
+  "$(render "$payload_repo")"
+
+printf 'TICKET_PREFIX=PROJ,ENG\nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+is "two prefixes in one source: the leftmost id wins, not the first listed" \
+  "$session_line | $(link https://tracker.example/ENG-7 ENG-7)" \
+  "$(render_session 'eng-7 rolls up proj-1234')"
+
+printf 'TICKET_PREFIX=PROJ1,PROJ2\nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+is "a prefix containing digits is not mangled" \
+  "$session_line | $(link https://tracker.example/PROJ1-1234 PROJ1-1234)" \
+  "$(render_session 'proj1-1234 add thing')"
+
+is "the shared URL follows whichever prefix matched" \
+  "$session_line | $(link https://tracker.example/PROJ2-88 PROJ2-88)" \
+  "$(render_session 'proj2-88 fix thing')"
+
+printf 'TICKET_PREFIX=NOPE,\nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+is "a trailing comma does not match every -<number>" \
+  "$base_line" "$(render "$payload_repo")"
+
+printf 'TICKET_PREFIX=,,\nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+is "a list of only blanks: no ticket segment" \
+  "$base_line" "$(render "$payload_repo")"
+
+is "env var takes a list too" \
+  "$base_line | PROJ-1234" \
+  "$(CLAUDE_STATUSLINE_TICKET_PREFIX=nope,proj render "$payload_repo")"
+
+printf 'TICKET_PREFIX=PROJ\nTICKET_URL=https://tracker.example/{ticket}\n' > "$global_conf"
+
 # ---- linked worktrees -------------------------------------------------------
 
 # `git worktree add` populates only tracked files, and statusline.conf is typically

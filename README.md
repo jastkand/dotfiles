@@ -73,6 +73,12 @@ TICKET_URL=https://linear.app/your-workspace/issue/{ticket}
 The prefix is matched case-insensitively against the session name first, then the git branch —
 `feature/proj-1234-add-thing` becomes a clickable `PROJ-1234`. Drop `TICKET_URL` to show the bare
 id. `CLAUDE_STATUSLINE_TICKET_PREFIX` / `CLAUDE_STATUSLINE_TICKET_URL` override both files.
+
+`TICKET_PREFIX` also takes a comma-separated list — `TICKET_PREFIX=PROJ,ENG` — for a repo whose
+branches carry keys from more than one project. All of them share the single `TICKET_URL`, which
+is what trackers like Linear and Jira want anyway, since only the project key differs. When a
+branch mentions two of them, the one appearing first in the branch wins, not the one listed
+first in the conf.
 Conf files are parsed as `KEY=VALUE`, never sourced, so an untrusted repo's config cannot
 execute anything.
 

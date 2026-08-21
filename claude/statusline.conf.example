@@ -9,6 +9,7 @@
 
 # Issue key prefix to look for in the session name and git branch, case-insensitively.
 # A branch like `feature/proj-1234-add-thing` renders as PROJ-1234.
+# Several prefixes can be listed, separated by commas: TICKET_PREFIX=PROJ,ENG,OPS
 TICKET_PREFIX=PROJ
 
 # Optional. Makes the ticket id a clickable OSC 8 hyperlink; {ticket} is replaced

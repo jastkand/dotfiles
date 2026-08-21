@@ -15,6 +15,8 @@
 #   1. session_name field from the stdin payload (if Claude Code provides one)
 #   2. git branch of workspace.current_dir
 # The first case-insensitive match of <prefix>-[0-9]+ is uppercased into <PREFIX>-<n>.
+# TICKET_PREFIX may list several prefixes separated by commas (PROJ1,PROJ2); they share
+# one TICKET_URL, and the leftmost id in the source wins.
 #
 # Effort detection order:
 #   1. effort-related field in the stdin payload (.effort.level, or plain .effort / .effort_level / .model.effort)
@@ -100,17 +102,32 @@ if [ -z "$ticket_prefix" ]; then
   load_conf "$HOME/.claude/statusline.conf"
 fi
 
+# TICKET_PREFIX holds one prefix or a comma-separated list of them, which becomes a
+# single regex alternation. Matching them all in one pass means the leftmost id in the
+# source wins, rather than whichever prefix happens to be listed first.
+# Split on commas through tr rather than by setting IFS, so the loop does not depend on
+# the shell word-splitting an unquoted expansion. The sed drops surrounding whitespace
+# and, importantly, blank elements ("PROJ," or a bare ","): an empty alternative would
+# match every -<number>, quietly turning any branch at all into a ticket.
+prefix_re=""
+if [ -n "$ticket_prefix" ]; then
+  prefix_re=$(printf '%s' "$ticket_prefix" | tr ',' '\n' \
+    | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^$/d' \
+    | tr '\n' '|' \
+    | sed -e 's/|$//')
+fi
+
 # Find a <PREFIX>-<number> ticket, preferring the session name over the branch.
 ticket=""
-if [ -n "$ticket_prefix" ]; then
-  prefix_up=$(printf '%s' "$ticket_prefix" | tr '[:lower:]' '[:upper:]')
+if [ -n "$prefix_re" ]; then
   for src in "$session_name" "$branch"; do
     # 2>/dev/null: a prefix with regex metacharacters makes grep complain rather
     # than match, and the ticket segment should degrade quietly instead.
-    match=$(printf '%s' "$src" | grep -Eio "$ticket_prefix-[0-9]+" 2>/dev/null | head -1)
+    match=$(printf '%s' "$src" | grep -Eio "($prefix_re)-[0-9]+" 2>/dev/null | head -1)
     if [ -n "$match" ]; then
-      num=$(printf '%s' "$match" | grep -Eo '[0-9]+')
-      ticket="$prefix_up-$num"
+      # Uppercase the match itself: it is already exactly <prefix>-<number>, and
+      # reassembling it from the configured prefix would mangle one with digits in it.
+      ticket=$(printf '%s' "$match" | tr '[:lower:]' '[:upper:]')
       break
     fi
   done
