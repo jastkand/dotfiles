@@ -128,11 +128,16 @@ lines, move anything worth having everywhere into this repo's `.zshrc`, and put 
 
 ### Git branch and worktree helpers
 
-`gwbd [-f] <branch>...` deletes branches that are checked out in a worktree, which plain
-`git branch -D` refuses to do -- it removes each branch's worktree first, then deletes them
-all in one `git branch -D`. A worktree holding uncommitted or untracked files is left alone
-unless `-f` is given; a worktree whose directory was deleted by hand is pruned. The branch
-of the main worktree, and any worktree you are currently standing in, are never touched.
+`gwbd [-f|-ff] <branch>...` deletes branches that are checked out in a worktree, which
+plain `git branch -D` refuses to do -- it removes each branch's worktree first, then deletes
+them all in one `git branch -D`. A worktree whose directory was deleted by hand is pruned.
+The branch of the main worktree, and any worktree you are currently standing in, are never
+touched.
+
+Force comes in the same two levels `git worktree remove` uses: `-f` removes a worktree
+holding uncommitted or untracked files, and `-ff` also overrides a lock. Claude Code locks
+every worktree it opens for a session, so `-ff` is what a branch left behind by a finished
+session needs.
 
 Install guide: https://github.com/robbyrussell/oh-my-zsh
 

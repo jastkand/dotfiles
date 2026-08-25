@@ -43,17 +43,23 @@ alias gcem='gc --allow-empty -m "bump"'
 # `git branch -D` refuses those and only tells you the path, so remove the worktree first
 # and then delegate the deletion. A worktree with uncommitted or untracked files is left
 # alone unless -f is given: losing that work is worse than a second run of the command.
+# A locked worktree -- Claude Code locks the ones it opens for a session -- needs -ff, the
+# same escalation `git worktree remove` itself asks for.
 gwbd() {
   emulate -L zsh
-  local -a force
+  local -i n=0
   while [[ $1 == -* ]]; do
     case $1 in
-      -f|--force) force=(--force); shift ;;
+      -f|--force) (( n++ )); shift ;;
+      -ff) (( n += 2 )); shift ;;
       --) shift; break ;;
       *) print -u2 "gwbd: unknown option: $1"; return 1 ;;
     esac
   done
-  (( $# )) || { print -u2 "usage: gwbd [-f] <branch>..."; return 1 }
+  (( $# )) || { print -u2 "usage: gwbd [-f|-ff] <branch>..."; return 1 }
+  local -a force
+  (( n > 0 )) && force=(--force)
+  (( n > 1 )) && force+=(--force)
   git rev-parse --git-dir >/dev/null || return
 
   # Map branch -> worktree path. In the porcelain format every worktree is a record
@@ -80,7 +86,8 @@ gwbd() {
     elif [[ ! -d $dir ]]; then
       git worktree prune   # directory already gone by hand, just drop the registration
     elif ! git worktree remove $force "$dir"; then
-      (( $#force )) || print -u2 "gwbd: rerun with -f to remove $dir anyway"
+      (( n == 0 )) && print -u2 "gwbd: rerun with -f to remove $dir anyway"
+      (( n == 1 )) && print -u2 "gwbd: if $dir is locked, -ff overrides the lock"
     fi
   done
 
