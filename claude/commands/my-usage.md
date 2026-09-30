@@ -53,3 +53,10 @@ claude -p "/usage" --output-format json | jq -r .result
 ```
 If that also fails, say so plainly and show the raw output rather than guessing at numbers. Never
 estimate usage percentages from any other source.
+
+When Claude is configured against Z.ai (`ANTHROPIC_BASE_URL` at api.z.ai or open.bigmodel.cn),
+the cache is filled from Z.ai's quota endpoint instead of `/usage`: `.session` is the shortest
+GLM quota window (5h on current plans), `.weeks` holds the longer ones, and `.report` is the raw
+quota JSON rather than /usage text. Render the table from `.session`/`.weeks` alone, skip steps
+3–5, and do not use the fallback above — with a Z.ai token there is no Anthropic subscription
+for `/usage` to report on.

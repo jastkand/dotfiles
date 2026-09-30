@@ -16,6 +16,14 @@
 #
 # Spawned in the background by statusline.sh, or run directly by the skill. A lock
 # keeps concurrent sessions from all refreshing at once.
+#
+# When ANTHROPIC_BASE_URL points at Z.ai (api.z.ai, open.bigmodel.cn) there is no
+# Anthropic subscription for `/usage` to read, so the numbers come from Z.ai's own
+# quota endpoint instead: GET https://<api host>/api/monitor/usage/quota/limit with
+# the same auth token — undocumented, but the data behind their Usage Statistics
+# page. The cache shape is unchanged: the shortest quota window (5h on GLM plans)
+# fills "session", longer ones fill "weeks" with a unit-initial label, and .report
+# holds the raw response JSON rather than /usage text.
 
 PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 export PATH
@@ -35,8 +43,132 @@ fi
 mkdir "$lock" 2>/dev/null || exit 0
 trap 'rmdir "$lock" 2>/dev/null' EXIT INT TERM
 
-command -v claude >/dev/null 2>&1 || exit 0
 command -v jq >/dev/null 2>&1 || exit 0
+
+settings_file="$HOME/.claude/settings.json"
+
+# Read one env override out of settings.json. Values there are what a fresh
+# `claude` start would use; the process environment, when set, wins below.
+settings_env() {
+  [ -f "$settings_file" ] || return 0
+  jq -r --arg k "$1" '.env[$k] // empty' "$settings_file" 2>/dev/null
+}
+
+# write_cache <session_json> <weeks_json> <max_pct> <report>
+write_cache() {
+  jq -n \
+    --argjson fetched_at "$(date +%s)" \
+    --argjson session "$1" \
+    --argjson weeks "$2" \
+    --argjson max_pct "$3" \
+    --arg report "$4" \
+    '{fetched_at:$fetched_at, session:$session, weeks:$weeks, max_pct:$max_pct, report:$report}' \
+    > "$cache.tmp" 2>/dev/null && mv "$cache.tmp" "$cache" 2>/dev/null
+}
+
+# Z.ai GLM Coding Plan usage. Returns 1 when Claude is not pointed at Z.ai,
+# 0 once the cache has been written (or the attempt failed conclusively).
+refresh_zai() {
+  base_url=${ANTHROPIC_BASE_URL:-$(settings_env ANTHROPIC_BASE_URL)}
+  case "$base_url" in
+    *api.z.ai/*|*bigmodel.cn/*) : ;;
+    *) return 1 ;;
+  esac
+  command -v curl >/dev/null 2>&1 || return 0
+
+  # The quota endpoint lives on the API host, so the international and China
+  # regions both work without hardcoding either one.
+  api_host=$(printf '%s' "$base_url" | sed -E 's#^[a-z]+://([^/]+).*#\1#')
+
+  token=${ANTHROPIC_AUTH_TOKEN:-$(settings_env ANTHROPIC_AUTH_TOKEN)}
+  [ -n "$token" ] || return 0
+
+  # The token reaches curl through a config read on stdin, not a command-line
+  # argument, so it never shows up in argv.
+  raw=$(printf 'header = "authorization: Bearer %s"\n' "$token" \
+    | curl -sS -K - --max-time 15 -H "accept: application/json" \
+        "https://$api_host/api/monitor/usage/quota/limit" 2>/dev/null) || return 0
+  printf '%s' "$raw" | jq -e '.success == true' >/dev/null 2>&1 || return 0
+
+  # Each limit is one quota window: unit codes 1/3/5/6 mean day/hour/minute/
+  # week, number is how many of those per window, percentage how much is used.
+  # TIME_LIMIT is the MCP tool-call lane, not token usage, and is dropped. The
+  # shortest window takes the session slot the way the 5-hour limit does for
+  # Anthropic subscriptions; the rest are labelled with their unit's initial.
+  rows=$(printf '%s' "$raw" | jq -r '
+    def mins: {"1":1440,"3":60,"5":1,"6":10080}[(.unit|tostring)];
+    def uname: {"1":"day","3":"hour","5":"minute","6":"week"}[(.unit|tostring)] // "window";
+    [ (.data.limits // [])[]
+      | select(.type != "TIME_LIMIT")
+      | mins as $m | select($m and (.percentage | type == "number"))
+      | uname as $u
+      | {min: ($m * .number),
+         label: ($u | .[0:1] | ascii_upcase),
+         name: "\(.number) \($u) window",
+         pct: .percentage,
+         epoch: (((.nextResetTime // 0) / 1000) | floor)}
+    ] | sort_by(.min)
+    | .[] | [.min, .label, .name, .pct, .epoch] | @tsv
+  ' 2>/dev/null)
+
+  now=$(date +%s)
+  session_json="null"
+  weeks_json="[]"
+  max=0
+  i=0
+  old_ifs=$IFS
+  IFS='
+'
+  for r in $rows; do
+    min=$(printf '%s' "$r" | cut -f1)
+    label=$(printf '%s' "$r" | cut -f2)
+    name=$(printf '%s' "$r" | cut -f3)
+    pct=$(printf '%s' "$r" | cut -f4)
+    epoch=$(printf '%s' "$r" | cut -f5)
+    case "$pct" in ''|*[!0-9]*) continue ;; esac
+    # A 5-hour reset reported further out than 5h+1m is a timezone bug on the
+    # API side (CodexBar guards the same way); show no countdown rather than a
+    # wrong one. An epoch of 0 means the API sent no reset time at all.
+    if [ "$min" = 300 ] && [ "$epoch" -gt "$(( now + 18120 ))" ]; then
+      epoch=""
+    fi
+    [ "$epoch" = 0 ] && epoch=""
+    reset_text=""
+    [ -n "$epoch" ] && reset_text=$(date -r "$epoch" "+%b %d at %H:%M (%Z)" 2>/dev/null)
+    [ "$pct" -gt "$max" ] && max=$pct
+    if [ "$i" = 0 ] && [ "$min" -lt 1440 ]; then
+      session_json=$(jq -n \
+        --argjson pct "$pct" \
+        --arg reset_text "$reset_text" \
+        --argjson reset_epoch "${epoch:-null}" \
+        '{pct:$pct, reset_text:$reset_text, reset_epoch:$reset_epoch}')
+    else
+      weeks_json=$(printf '%s' "$weeks_json" | jq \
+        --arg label "$label" \
+        --arg name "$name" \
+        --argjson pct "$pct" \
+        --arg reset_text "$reset_text" \
+        --argjson reset_epoch "${epoch:-null}" \
+        '. + [{label:$label, name:$name, pct:$pct, reset_text:$reset_text, reset_epoch:$reset_epoch}]')
+    fi
+    i=$(( i + 1 ))
+  done
+  IFS=$old_ifs
+
+  # The full response, pretty-printed for the /my-usage skill.
+  report=$(printf '%s' "$raw" | jq . 2>/dev/null) || report=$raw
+
+  write_cache "$session_json" "$weeks_json" "$max" "$report"
+  return 0
+}
+
+if refresh_zai; then
+  # Drop the flat cache used before this script emitted JSON.
+  rm -f "$HOME/.claude/usage-cache.txt" 2>/dev/null
+  exit 0
+fi
+
+command -v claude >/dev/null 2>&1 || exit 0
 
 # Turn "Aug 7 at 7pm (Asia/Omsk)" into an epoch. The parenthesised zone is the one
 # the timestamp is expressed in, and the year is absent, so it is filled from today
@@ -123,14 +255,7 @@ for w in $weeks; do
 done
 IFS=$old_ifs
 
-jq -n \
-  --argjson fetched_at "$(date +%s)" \
-  --argjson session "$session_json" \
-  --argjson weeks "$weeks_json" \
-  --argjson max_pct "$max" \
-  --arg report "$raw" \
-  '{fetched_at:$fetched_at, session:$session, weeks:$weeks, max_pct:$max_pct, report:$report}' \
-  > "$cache.tmp" 2>/dev/null && mv "$cache.tmp" "$cache" 2>/dev/null
+write_cache "$session_json" "$weeks_json" "$max" "$raw"
 
 # Drop the flat cache used before this script emitted JSON.
 rm -f "$HOME/.claude/usage-cache.txt" 2>/dev/null

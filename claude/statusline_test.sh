@@ -1,5 +1,5 @@
 #!/bin/sh
-# Tests for statusline.sh and patch-settings.sh.
+# Tests for statusline.sh, usage-refresh.sh and patch-settings.sh.
 #
 # Run with `make test-claude`, or directly: sh claude/statusline_test.sh
 # Needs git and jq. Everything happens in a temp dir under a fake $HOME, so the
@@ -292,6 +292,87 @@ like "usage segment renders, coloured red above 90 and yellow at 70+" \
   '\| \^\[\[31mS:95%\^\[\[0m \([0-9]+h[0-9]+m\) · \^\[\[33mW:72%\^\[\[0m · \^\[\[0mO:10%\^\[\[0m$' \
   "$(render "$payload_repo")"
 rm -f "$HOME/.claude/usage-cache.json"
+
+# ---- usage-refresh.sh -------------------------------------------------------
+
+# The refresh script resets PATH internally to "$HOME/.local/bin:/opt/homebrew/
+# bin:...", so the fakes are planted in $HOME/.local/bin, which lives inside the
+# test's fake $HOME. Fake curl serves a Z.ai quota fixture, fake claude an
+# Anthropic /usage report: no network, no real credentials involved.
+
+echo "usage-refresh.sh"
+
+refresh="$here/usage-refresh.sh"
+cache_file="$HOME/.claude/usage-cache.json"
+local_bin="$HOME/.local/bin"
+mkdir -p "$local_bin"
+
+cat > "$local_bin/curl" <<FAKE
+#!/bin/sh
+cat "$tmp/zai-quota.json"
+FAKE
+
+cat > "$local_bin/claude" <<FAKE
+#!/bin/sh
+printf '%s' '{"result":"Current session: 42% used, resets Oct 1 at 7pm (Asia/Omsk)\nCurrent week (all models): 13% used, resets Oct 5 at 7pm (Asia/Omsk)"}'
+FAKE
+chmod +x "$local_bin/curl" "$local_bin/claude"
+
+# A GLM Coding Plan payload: a 5-hour and a weekly credit window, plus the MCP
+# tool-call lane that must not surface as token usage.
+jq -n --argjson now "$(( $(date +%s) * 1000 ))" '
+  {code:200, msg:"Operation successful", success:true,
+   data:{level:"lite", limits:[
+     {type:"CREDIT_LIMIT", unit:3, number:5, usage:2000, currentValue:53,
+      remaining:1946, percentage:2, nextResetTime:($now + 7200000)},
+     {type:"CREDIT_LIMIT", unit:6, number:1, usage:10000, currentValue:507,
+      remaining:9492, percentage:5, nextResetTime:($now + 259200000)},
+     {type:"TIME_LIMIT", unit:5, number:1, usage:100, currentValue:1,
+      remaining:99, percentage:1, nextResetTime:($now + 1800000)}]}}' \
+  > "$tmp/zai-quota.json"
+
+ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" ANTHROPIC_AUTH_TOKEN=fake sh "$refresh"
+is "z.ai: the 5-hour window fills the session entry" \
+  "2" "$(jq -r '.session.pct // empty' "$cache_file")"
+like "z.ai: the session entry keeps a plausible reset countdown" \
+  '^[0-9]+$' "$(jq -r '.session.reset_epoch // empty' "$cache_file")"
+is "z.ai: the weekly window is labelled W" \
+  "W|1 week window|5" \
+  "$(jq -r '.weeks[0] | [.label, .name, .pct] | join("|")' "$cache_file")"
+is "z.ai: the MCP TIME_LIMIT lane is dropped" \
+  "1" "$(jq '.weeks | length' "$cache_file")"
+is "z.ai: max_pct covers both windows" \
+  "5" "$(jq -r '.max_pct' "$cache_file")"
+like "z.ai: report holds the raw quota JSON" \
+  'CREDIT_LIMIT' "$(jq -r '.report' "$cache_file")"
+
+# An empty env makes ${VAR:-fallback} fall through to settings.json, whatever
+# the surrounding environment happens to carry.
+rm -f "$cache_file"
+printf '{"env":{"ANTHROPIC_BASE_URL":"https://api.z.ai/api/anthropic","ANTHROPIC_AUTH_TOKEN":"fake"}}\n' \
+  > "$HOME/.claude/settings.json"
+ANTHROPIC_BASE_URL= ANTHROPIC_AUTH_TOKEN= sh "$refresh"
+is "z.ai detected from settings.json when the env is empty" \
+  "2" "$(jq -r '.session.pct // empty' "$cache_file")"
+rm -f "$HOME/.claude/settings.json"
+
+# A 5-hour reset more than 5h+1m out is a timezone bug on the API side: keep
+# the percentage, drop the countdown.
+jq -n --argjson now "$(( $(date +%s) * 1000 ))" '
+  {code:200, success:true, msg:"x", data:{level:"lite", limits:[
+    {type:"CREDIT_LIMIT", unit:3, number:5, usage:2000, currentValue:53,
+     remaining:1946, percentage:2, nextResetTime:($now + 36000000)}]}}' \
+  > "$tmp/zai-quota.json"
+ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic" ANTHROPIC_AUTH_TOKEN=fake sh "$refresh"
+is "z.ai: an implausible 5-hour reset shows no countdown" \
+  "null" "$(jq -c '.session.reset_epoch' "$cache_file")"
+
+# Anything else still goes through `claude -p /usage`.
+rm -f "$cache_file"
+ANTHROPIC_BASE_URL="https://api.anthropic.com" sh "$refresh"
+is "a non-z.ai base URL falls through to the /usage path" \
+  "42" "$(jq -r '.session.pct // empty' "$cache_file")"
+rm -f "$cache_file"
 
 # ---- patch-settings.sh ------------------------------------------------------
 

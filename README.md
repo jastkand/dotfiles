@@ -30,6 +30,7 @@ Copies into `~/.claude/`:
 - `rules/dotfiles.md` — standing preferences, loaded into every session in every project
 - `statusline.sh` — `<model> (<effort>) | <dir> | <branch> | <ticket> | <usage>`
 - `usage-refresh.sh` — background helper caching `/usage` into `~/.claude/usage-cache.json`
+  (or the Z.ai quota endpoint, when `ANTHROPIC_BASE_URL` points at Z.ai)
 - `commands/my-usage.md` — `/my-usage`, reads that cache and reports subscription limits
 
 `settings.json` is not overwritten: only its `statusLine` key is patched in with `jq`, so
