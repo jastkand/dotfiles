@@ -8,6 +8,7 @@
 brew "git"
 brew "git-lfs"   # ~/.gitconfig declares the lfs filters with required = true
 brew "gnupg"     # .gitconfig gpg.program
+brew "herdr"     # herdr/config.toml, and the iterm2/Herdr.json profile's key chords
 brew "jq"        # claude/statusline.sh, patch-settings.sh, statusline_test.sh
 brew "vim"       # .vimrc, and the `vi` alias in .zshrc
 brew "zsh"

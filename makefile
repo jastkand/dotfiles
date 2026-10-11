@@ -5,12 +5,12 @@ CLAUDE_DIR ?= $(HOME)/.claude
 # only lays down configs, and installing packages stays a deliberate `make bootstrap`.
 .DEFAULT_GOAL := install
 
-.PHONY: bootstrap install install-vim install-claude install-git install-zsh install-brew check-brew test test-claude
+.PHONY: bootstrap install install-vim install-claude install-git install-zsh install-herdr install-iterm2 install-brew check-brew test test-claude
 
 # Fresh machine: packages first, then the configs that depend on them.
 bootstrap: install-brew install
 
-install: install-vim install-claude install-git install-zsh
+install: install-vim install-claude install-git install-zsh install-herdr install-iterm2
 
 test: test-claude
 
@@ -67,6 +67,23 @@ install-zsh:
 		echo ".zshrc instead. See the ZSH section of README.md."; \
 		exit 1; \
 	fi
+
+# herdr keeps everything in one config.toml -- keybindings, theme, sidebar layout -- so
+# like .vimrc this file is overwritten wholesale: the repo's copy is the source of truth.
+# If you change settings from inside herdr, copy the file back into this repo. The reload
+# at the end is best-effort: with no herdr installed or no server running there is simply
+# nothing to reload.
+install-herdr:
+	@mkdir -p $(HOME)/.config/herdr
+	@cp ./herdr/config.toml $(HOME)/.config/herdr/config.toml
+	@herdr server reload-config >/dev/null 2>&1 || true
+
+# iTerm2 dynamic profile: iTerm2 watches the DynamicProfiles folder and hot-reloads it,
+# so the profile appears (or updates) without a restart. Editing the profile in iTerm2's
+# GUI does NOT write back to the file -- edit iterm2/Herdr.json instead.
+install-iterm2:
+	@mkdir -p "$(HOME)/Library/Application Support/iTerm2/DynamicProfiles"
+	@cp ./iterm2/Herdr.json "$(HOME)/Library/Application Support/iTerm2/DynamicProfiles/Herdr.json"
 
 # Statusline + /my-usage + standing preferences. Leaves ~/.claude/statusline.conf alone
 # (opt-in, see claude/statusline.conf.example) and patches only the statusLine key in

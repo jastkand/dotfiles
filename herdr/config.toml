@@ -1,0 +1,25 @@
+onboarding = false
+
+[theme]
+name = "gruvbox"
+auto_switch = false
+
+[ui]
+window_title = "herdr — {workspace}"
+
+[ui.toast]
+delivery = "terminal"
+
+[ui.sidebar.agents.rows_by_agent]
+claude = [["state_icon", "machine", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
+
+[keys]
+prefix = ["ctrl+a", "ctrl+b"]
+clear_pane = "ctrl+k"
+next_workspace = "alt+shift+]"
+previous_workspace = "alt+shift+["
+next_agent = "prefix+shift+p"
+previous_agent = "prefix+shift+o"
+
+[ui.sound]
+enabled = false

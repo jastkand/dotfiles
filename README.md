@@ -2,13 +2,15 @@
 
 ```sh
 make bootstrap      # fresh machine: brew packages, then configs
-make                # configs only (vim + claude + git + zsh)
+make                # configs only (vim + claude + git + zsh + herdr)
 make install-claude
 make install-git    # ~/.gitignore_global, plus an include.path entry so this repo's
                     # .gitconfig applies. ~/.gitconfig itself is never overwritten:
                     # identity, gpg and lfs settings are machine-local
 make install-zsh    # a ~/.zshrc that sources this repo's .zshrc. Same idea: ~/.zshrc
                     # itself is never overwritten, tool installers keep appending to it
+make install-herdr  # ~/.config/herdr/config.toml, overwritten wholesale
+make install-iterm2 # iTerm2 "Herdr" profile as a dynamic profile, hot-reloaded by iTerm2
 make check-brew     # what the Brewfile wants that is not installed yet
 make install-brew   # installs only what is missing, never upgrades
 make test
@@ -97,6 +99,24 @@ make test   # == make test-claude
 repo, covering the config precedence chain, every incomplete-config case, and `patch-settings.sh`.
 It touches nothing outside its temp dir.
 
+## Herdr
+
+```sh
+make install-herdr
+```
+
+Copies `herdr/config.toml` into `~/.config/herdr/config.toml`. herdr keeps everything in that
+one file — keybindings, theme, sidebar layout — so, like `.vimrc`, it is overwritten
+wholesale: edit the copy in this repo, not the installed one. If you change settings from
+inside herdr, copy the file back here:
+
+```sh
+cp ~/.config/herdr/config.toml ./herdr/config.toml
+```
+
+The target then reloads the running server's config (best-effort: no herdr, nothing to
+reload). herdr itself comes from the Brewfile — a plain homebrew-core formula.
+
 ## ZSH
 
 ```sh
@@ -163,6 +183,25 @@ FiraMono (https://github.com/powerline/fonts/tree/master/FiraMono).
 Gruvbox: https://github.com/morhetz/gruvbox
 
 ## iTerm 2 Preferences
+
+### Herdr profile
+
+```sh
+make install-iterm2
+```
+
+Installs `iterm2/Herdr.json` as an iTerm2 **dynamic profile**: iTerm2 watches
+`~/Library/Application Support/iTerm2/DynamicProfiles/` and hot-reloads it, so the
+profile appears and updates without a restart. The file carries the keyboard mappings
+that make herdr's chords work in iTerm2 (⌘K → ctrl+k, ⌥⇧[/] → kitty-encoded alt+shift
+brackets, ⌘←/⌘→ → Home/End) — without them iTerm2 composes `”`/`’` or sends `^A` and
+herdr never sees the keys.
+
+Editing the profile in iTerm2's GUI does **not** write back to the file. Change settings
+by editing `iterm2/Herdr.json` (the repo's copy is the source of truth), or re-export the
+profile from iTerm2 and re-apply the two hand edits the file needs: regenerate the `Guid`
+(it must not duplicate a regular profile's, or iTerm2 silently ignores the dynamic one)
+and keep the JSON wrapped in `{"Profiles": [...]}`.
 
 ### Set up theme
 
