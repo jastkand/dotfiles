@@ -203,6 +203,11 @@ profile from iTerm2 and re-apply the two hand edits the file needs: regenerate t
 (it must not duplicate a regular profile's, or iTerm2 silently ignores the dynamic one)
 and keep the JSON wrapped in `{"Profiles": [...]}`.
 
+The target also turns on iTerm2's global "Ctrl-click reported to apps" preference
+(`PassOnControlClick`). herdr captures the mouse and opens links — such as the statusline's
+ticket link — on **ctrl-click**, not ⌘-click; without this, iTerm2 turns ctrl-click into a
+context-menu click and herdr never sees it. Restart iTerm2 once after the first install.
+
 ### Set up theme
 
 Gruvbox theme for iterm2 and others: https://github.com/morhetz/gruvbox-contrib
