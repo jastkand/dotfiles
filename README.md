@@ -204,9 +204,10 @@ herdr never sees the keys.
 
 `iterm2/Tuios.json` is for tuios (https://tuios.dev/), whose chords are mostly Option-based
 (`opt+1`–`9` workspaces, `opt+h/j/k/l` preselect, `opt+esc` out of terminal mode). So the
-left Option key sends Esc+ (right Option stays normal, for typing composed characters), and
-the Option-arrow word-jump mappings are dropped so `alt+arrow` reaches tuios's pane focus
-instead of becoming `Esc b`/`Esc f`. The herdr-specific chords are left out too. The
+left Option key sends Esc+ (right Option stays normal, for typing composed characters).
+⌥←/→/↑/↓ send the xterm alt+arrow sequences (`ESC [1;3D` and so on) that tuios reads as
+`alt+left` etc. — its pane-focus keys in terminal mode — instead of the Herdr profile's
+`Esc b`/`Esc f` word jumps. The herdr-specific chords are left out too. The
 remaining mappings are plain text editing: ⌘←/⌘→ → Home/End, ⌘⌫ → ctrl+u, ⌥⌫ and
 forward-delete. Keymaps are still provisional.
 

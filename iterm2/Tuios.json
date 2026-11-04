@@ -183,6 +183,34 @@
           "Action": 11,
           "Text": "1b 5b 48",
           "Escaping": 2
+        },
+        "0xf700-0x280000": {
+          "Version": 2,
+          "Apply Mode": 0,
+          "Action": 11,
+          "Text": "1b 5b 31 3b 33 41",
+          "Escaping": 2
+        },
+        "0xf701-0x280000": {
+          "Version": 2,
+          "Apply Mode": 0,
+          "Action": 11,
+          "Text": "1b 5b 31 3b 33 42",
+          "Escaping": 2
+        },
+        "0xf702-0x280000": {
+          "Version": 2,
+          "Apply Mode": 0,
+          "Action": 11,
+          "Text": "1b 5b 31 3b 33 44",
+          "Escaping": 2
+        },
+        "0xf703-0x280000": {
+          "Version": 2,
+          "Apply Mode": 0,
+          "Action": 11,
+          "Text": "1b 5b 31 3b 33 43",
+          "Escaping": 2
         }
       },
       "Window Type": 0,
