@@ -5,12 +5,14 @@ CLAUDE_DIR ?= $(HOME)/.claude
 # only lays down configs, and installing packages stays a deliberate `make bootstrap`.
 .DEFAULT_GOAL := install
 
-.PHONY: bootstrap install install-vim install-claude install-git install-zsh install-herdr install-iterm2 install-brew check-brew test test-claude
+TUIOS_DIR ?= $(HOME)/Library/Application Support/tuios
+
+.PHONY: bootstrap install install-vim install-claude install-git install-zsh install-herdr install-tuios install-iterm2 install-brew check-brew test test-claude
 
 # Fresh machine: packages first, then the configs that depend on them.
 bootstrap: install-brew install
 
-install: install-vim install-claude install-git install-zsh install-herdr install-iterm2
+install: install-vim install-claude install-git install-zsh install-herdr install-tuios install-iterm2
 
 test: test-claude
 
@@ -77,6 +79,17 @@ install-herdr:
 	@mkdir -p $(HOME)/.config/herdr
 	@cp ./herdr/config.toml $(HOME)/.config/herdr/config.toml
 	@herdr server reload-config >/dev/null 2>&1 || true
+
+# tuios keeps its settings in one config.toml as well -- appearance, keybindings, dock -- and
+# on macOS reads it from Application Support, not ~/.config. Same rule as herdr: the repo's
+# copy is the source of truth and the installed one is overwritten wholesale. Note that
+# `tuios set-config` and the in-app settings page write to the installed file, so copy it
+# back here after changing settings that way. tuios watches the file and picks a save up by
+# itself; the apply is a best-effort nudge for a running daemon.
+install-tuios:
+	@mkdir -p "$(TUIOS_DIR)"
+	@cp ./tuios/config.toml "$(TUIOS_DIR)/config.toml"
+	@tuios config apply >/dev/null 2>&1 || true
 
 # iTerm2 dynamic profiles: iTerm2 watches the DynamicProfiles folder and hot-reloads it,
 # so the profiles appear (or update) without a restart. Every iterm2/*.json is one profile

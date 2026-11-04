@@ -10,6 +10,7 @@ make install-git    # ~/.gitignore_global, plus an include.path entry so this re
 make install-zsh    # a ~/.zshrc that sources this repo's .zshrc. Same idea: ~/.zshrc
                     # itself is never overwritten, tool installers keep appending to it
 make install-herdr  # ~/.config/herdr/config.toml, overwritten wholesale
+make install-tuios  # ~/Library/Application Support/tuios/config.toml, overwritten wholesale
 make install-iterm2 # iTerm2 "Herdr" and "Tuios" profiles as dynamic profiles, hot-reloaded
 make check-brew     # what the Brewfile wants that is not installed yet
 make install-brew   # installs only what is missing, never upgrades
@@ -117,6 +118,33 @@ cp ~/.config/herdr/config.toml ./herdr/config.toml
 The target then reloads the running server's config (best-effort: no herdr, nothing to
 reload). herdr itself comes from the Brewfile — a plain homebrew-core formula.
 
+## Tuios
+
+```sh
+make install-tuios
+```
+
+Copies `tuios/config.toml` into `~/Library/Application Support/tuios/config.toml` (on macOS
+tuios reads it from there, not `~/.config`). Same rule as herdr: overwritten wholesale, the
+repo's copy is the source of truth. `tuios set-config` and the in-app settings page (`,` in
+window mode) write to the installed file, so after changing settings that way copy it back:
+
+```sh
+cp ~/Library/Application\ Support/tuios/config.toml ./tuios/config.toml
+```
+
+tuios watches the file, so an install takes effect without a restart.
+
+What it sets beyond the gruvbox theme, tiled startup and the daemon: which mode you are in
+is visible at a glance. The dock's mode pill shows `WINDOW` / `TERM` even while tiling is
+on, and the focused pane's border is yellow in window mode (keys manage panes) and green in
+terminal mode (keys go to the program). ⌥[ / ⌥] step to the previous / next workspace that
+has panes, in both modes, next to the stock ⌥1–⌥9. `[hosts]` names the machines tuios links
+to over ssh, by their `~/.ssh/config` alias.
+
+The Claude Code hooks that report agent state to tuios are not part of this config: they
+live in `~/.claude/settings.json`, written by `tuios integration install claude-code`.
+
 ## ZSH
 
 ```sh
@@ -207,7 +235,9 @@ herdr never sees the keys.
 left Option key sends Esc+ (right Option stays normal, for typing composed characters).
 ⌥←/→/↑/↓ send the xterm alt+arrow sequences (`ESC [1;3D` and so on) that tuios reads as
 `alt+left` etc. — its pane-focus keys in terminal mode — instead of the Herdr profile's
-`Esc b`/`Esc f` word jumps. The herdr-specific chords are left out too. The
+`Esc b`/`Esc f` word jumps. ⌥[ and ⌥] send kitty-encoded alt+[ / alt+] (`ESC [91;3u`,
+`ESC [93;3u`) for tuios's workspace cycling: with Esc+ they would otherwise go out as a bare
+`ESC [` / `ESC ]`, the start of an escape sequence. The herdr-specific chords are left out too. The
 remaining mappings are plain text editing: ⌘←/⌘→ → Home/End, ⌘⌫ → ctrl+u, ⌥⌫ and
 forward-delete. Keymaps are still provisional.
 
