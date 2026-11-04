@@ -10,7 +10,7 @@ make install-git    # ~/.gitignore_global, plus an include.path entry so this re
 make install-zsh    # a ~/.zshrc that sources this repo's .zshrc. Same idea: ~/.zshrc
                     # itself is never overwritten, tool installers keep appending to it
 make install-herdr  # ~/.config/herdr/config.toml, overwritten wholesale
-make install-iterm2 # iTerm2 "Herdr" profile as a dynamic profile, hot-reloaded by iTerm2
+make install-iterm2 # iTerm2 "Herdr" and "Tuios" profiles as dynamic profiles, hot-reloaded
 make check-brew     # what the Brewfile wants that is not installed yet
 make install-brew   # installs only what is missing, never upgrades
 make test
@@ -168,14 +168,16 @@ Plugin for highlighting command: https://github.com/zsh-users/zsh-syntax-highlig
 
 ## Agnoster theme
 
-Font — JetBrains Mono (https://github.com/JetBrains/JetBrainsMono), installed by the
+Font — **JetBrainsMonoNL Nerd Font Mono**: JetBrains Mono patched with Nerd Font icons
+(https://www.nerdfonts.com/), without ligatures, icons one cell wide. Installed by the
 Brewfile, or on its own:
 
 ```sh
-brew install --cask font-jetbrains-mono
+brew install --cask font-jetbrains-mono-nerd-font
 ```
 
-Then pick it in iTerm: CMD+i -> Text -> Font.
+The dynamic profiles below already use it (`JetBrainsMonoNLNFM-Regular 12`); for any other
+profile pick it in iTerm: CMD+i -> Text -> Font.
 
 Alternatives: Powerline fonts (https://github.com/powerline/fonts), of which
 FiraMono (https://github.com/powerline/fonts/tree/master/FiraMono).
@@ -184,11 +186,14 @@ Gruvbox: https://github.com/morhetz/gruvbox
 
 ## iTerm 2 Preferences
 
-### Herdr profile
+### Herdr and Tuios profiles
 
 ```sh
 make install-iterm2
 ```
+
+Every `iterm2/*.json` is installed as a dynamic profile. Both share the same colors and
+font; they differ in key handling.
 
 Installs `iterm2/Herdr.json` as an iTerm2 **dynamic profile**: iTerm2 watches
 `~/Library/Application Support/iTerm2/DynamicProfiles/` and hot-reloads it, so the
@@ -197,8 +202,16 @@ that make herdr's chords work in iTerm2 (⌘K → ctrl+k, ⌥⇧[/] → kitty-en
 brackets, ⌘←/⌘→ → Home/End) — without them iTerm2 composes `”`/`’` or sends `^A` and
 herdr never sees the keys.
 
-Editing the profile in iTerm2's GUI does **not** write back to the file. Change settings
-by editing `iterm2/Herdr.json` (the repo's copy is the source of truth), or re-export the
+`iterm2/Tuios.json` is for tuios (https://tuios.dev/), whose chords are mostly Option-based
+(`opt+1`–`9` workspaces, `opt+h/j/k/l` preselect, `opt+esc` out of terminal mode). So the
+left Option key sends Esc+ (right Option stays normal, for typing composed characters), and
+the Option-arrow word-jump mappings are dropped so `alt+arrow` reaches tuios's pane focus
+instead of becoming `Esc b`/`Esc f`. The herdr-specific chords are left out too. The
+remaining mappings are plain text editing: ⌘←/⌘→ → Home/End, ⌘⌫ → ctrl+u, ⌥⌫ and
+forward-delete. Keymaps are still provisional.
+
+Editing a profile in iTerm2's GUI does **not** write back to the file. Change settings
+by editing the json in `iterm2/` (the repo's copy is the source of truth), or re-export the
 profile from iTerm2 and re-apply the two hand edits the file needs: regenerate the `Guid`
 (it must not duplicate a regular profile's, or iTerm2 silently ignores the dynamic one)
 and keep the JSON wrapped in `{"Profiles": [...]}`.

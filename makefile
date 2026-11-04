@@ -78,16 +78,17 @@ install-herdr:
 	@cp ./herdr/config.toml $(HOME)/.config/herdr/config.toml
 	@herdr server reload-config >/dev/null 2>&1 || true
 
-# iTerm2 dynamic profile: iTerm2 watches the DynamicProfiles folder and hot-reloads it,
-# so the profile appears (or updates) without a restart. Editing the profile in iTerm2's
-# GUI does NOT write back to the file -- edit iterm2/Herdr.json instead.
+# iTerm2 dynamic profiles: iTerm2 watches the DynamicProfiles folder and hot-reloads it,
+# so the profiles appear (or update) without a restart. Every iterm2/*.json is one profile
+# (Herdr, Tuios). Editing a profile in iTerm2's GUI does NOT write back to the file -- edit
+# the json in iterm2/ instead.
 #
 # PassOnControlClick is a global preference, not a profile setting: it lets ctrl-click
 # reach apps that report the mouse (herdr opens links on ctrl-click) instead of opening
 # iTerm2's context menu. Takes effect after an iTerm2 restart.
 install-iterm2:
 	@mkdir -p "$(HOME)/Library/Application Support/iTerm2/DynamicProfiles"
-	@cp ./iterm2/Herdr.json "$(HOME)/Library/Application Support/iTerm2/DynamicProfiles/Herdr.json"
+	@cp ./iterm2/*.json "$(HOME)/Library/Application Support/iTerm2/DynamicProfiles/"
 	@defaults write com.googlecode.iterm2 PassOnControlClick -bool true
 
 # Statusline + /my-usage + standing preferences. Leaves ~/.claude/statusline.conf alone
