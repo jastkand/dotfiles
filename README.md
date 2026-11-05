@@ -139,8 +139,16 @@ What it sets beyond the gruvbox theme, tiled startup and the daemon: which mode 
 is visible at a glance. The dock's mode pill shows `WINDOW` / `TERM` even while tiling is
 on, and the focused pane's border is yellow in window mode (keys manage panes) and green in
 terminal mode (keys go to the program). ⌥[ / ⌥] step to the previous / next workspace that
-has panes, in both modes, next to the stock ⌥1–⌥9. `[hosts]` names the machines tuios links
-to over ssh, by their `~/.ssh/config` alias.
+has panes, in both modes, next to the stock ⌥1–⌥9. ⌘K clears the focused pane — scrollback
+and the rows above the prompt — through `tuios clear-history --screen`, bound as a `shell`
+command key on super+k; ctrl+k stays the shell's kill-line.
+
+Machine-local settings stay out of this file. `[hosts]` — the machines tuios links to over ssh,
+by their `~/.ssh/config` alias — goes in `config.d/local.toml` next to the installed
+`config.toml`. tuios reads every `config.d/*.toml` underneath `config.toml`, and
+`make install-tuios` never touches that folder. `tuios hosts add` writes a new host to the
+file that already holds `[hosts]`. On a machine with no `local.toml` yet, it may write the host
+into `config.toml` instead; move it over before copying `config.toml` back into the repo.
 
 The Claude Code hooks that report agent state to tuios are not part of this config: they
 live in `~/.claude/settings.json`, written by `tuios integration install claude-code`.
@@ -237,9 +245,15 @@ left Option key sends Esc+ (right Option stays normal, for typing composed chara
 `alt+left` etc. — its pane-focus keys in terminal mode — instead of the Herdr profile's
 `Esc b`/`Esc f` word jumps. ⌥[ and ⌥] send kitty-encoded alt+[ / alt+] (`ESC [91;3u`,
 `ESC [93;3u`) for tuios's workspace cycling: with Esc+ they would otherwise go out as a bare
-`ESC [` / `ESC ]`, the start of an escape sequence. The herdr-specific chords are left out too. The
+`ESC [` / `ESC ]`, the start of an escape sequence. ⌘K sends kitty-encoded super+k
+(`ESC [107;9u`) instead of running iTerm2's own Clear Buffer, which tuios would never see.
+The other herdr-specific chords are left out. The
 remaining mappings are plain text editing: ⌘←/⌘→ → Home/End, ⌘⌫ → ctrl+u, ⌥⌫ and
 forward-delete. Keymaps are still provisional.
+
+A tab that is already open does not always pick up a changed profile: once a tab's own
+settings were touched (Edit Session, ⌘+/⌘− font size) it keeps the copy it had. If a new key
+mapping does nothing, re-apply the profile to the tab or open a new one.
 
 Editing a profile in iTerm2's GUI does **not** write back to the file. Change settings
 by editing the json in `iterm2/` (the repo's copy is the source of truth), or re-export the

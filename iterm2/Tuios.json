@@ -225,6 +225,13 @@
           "Action": 11,
           "Text": "1b 5b 39 33 3b 33 75",
           "Escaping": 2
+        },
+        "0x6b-0x100000-0x28": {
+          "Version": 2,
+          "Apply Mode": 0,
+          "Action": 11,
+          "Text": "1b 5b 31 30 37 3b 39 75",
+          "Escaping": 2
         }
       },
       "Window Type": 0,

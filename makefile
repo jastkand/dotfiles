@@ -86,6 +86,10 @@ install-herdr:
 # `tuios set-config` and the in-app settings page write to the installed file, so copy it
 # back here after changing settings that way. tuios watches the file and picks a save up by
 # itself; the apply is a best-effort nudge for a running daemon.
+#
+# Machine-local settings -- [hosts], which name this machine's ssh aliases -- go in
+# config.d/local.toml next to it instead. tuios reads every config.d/*.toml under config.toml,
+# and this target never touches that folder.
 install-tuios:
 	@mkdir -p "$(TUIOS_DIR)"
 	@cp ./tuios/config.toml "$(TUIOS_DIR)/config.toml"

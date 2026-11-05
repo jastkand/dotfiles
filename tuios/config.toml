@@ -131,12 +131,18 @@ dock_mode_icon_terminal = "TERM"
 border_focused_color_window = "bright_yellow"
 border_focused_color_terminal = "bright_green"
 
-[hosts.as-jastkand]
-addr = "as-jastkand"
-
 # opt+[ / opt+] step through the workspaces that have panes, in both modes. iTerm2 sends
 # them as kitty-encoded keys (see iterm2/Tuios.json): a bare ESC [ / ESC ] would be read
 # as the start of an escape sequence.
 [keybindings.global]
 prev_workspace = ["alt+["]
 next_workspace = ["alt+]"]
+
+# cmd+k clears the focused pane's scrollback and the rows above the prompt, like cmd+k in
+# iTerm2 itself. The Tuios iTerm2 profile sends it as kitty-encoded super+k; ctrl+k is left
+# to the shell (kill-line).
+[[keybindings.command]]
+key = "super+k"
+type = "shell"
+command = "tuios clear-history --screen"
+description = "Clear the pane, like cmd+k"
