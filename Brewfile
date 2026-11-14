@@ -9,6 +9,7 @@ brew "git"
 brew "git-lfs"   # ~/.gitconfig declares the lfs filters with required = true
 brew "gnupg"     # .gitconfig gpg.program
 brew "herdr"     # herdr/config.toml, and the iterm2/Herdr.json profile's key chords
+brew "tuios"     # the iterm2/Tuios.json profile
 brew "jq"        # claude/statusline.sh, patch-settings.sh, statusline_test.sh
 brew "vim"       # .vimrc, and the `vi` alias in .zshrc
 brew "zsh"
@@ -17,12 +18,15 @@ brew "fzf"
 brew "asdf"      # runtime versions stay in each project's own .tool-versions
 brew "coreutils"
 
-# The powerline font the agnoster theme and iTerm profile expect.
-# https://github.com/JetBrains/JetBrainsMono
-# If JetBrainsMono-*.ttf were already dropped into ~/Library/Fonts by hand, brew will
-# refuse to link over them. Clear the hand-installed copies first, or adopt them:
-#   brew install --cask --adopt font-jetbrains-mono
-cask "font-jetbrains-mono"
+# The font the agnoster theme and the iTerm profiles expect: "JetBrainsMonoNL Nerd Font
+# Mono" (PostScript JetBrainsMonoNLNFM-*). JetBrains Mono patched with Nerd Font icons,
+# which tuios draws in its sidebar and dock; NL = no ligatures, Mono = icons kept to one
+# cell wide. https://www.nerdfonts.com/
+# If the *NerdFont*.ttf files were already dropped into ~/Library/Fonts by hand (the
+# nerdfonts.com download), brew will refuse to link over them. Clear the hand-installed
+# copies first, or adopt them:
+#   brew install --cask --adopt font-jetbrains-mono-nerd-font
+cask "font-jetbrains-mono-nerd-font"
 
 # GUI apps this repo configures. Left commented because they are already installed by
 # hand on this machine, and brew refuses to take over a non-brew app — uncommenting

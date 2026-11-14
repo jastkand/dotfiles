@@ -5,12 +5,14 @@ CLAUDE_DIR ?= $(HOME)/.claude
 # only lays down configs, and installing packages stays a deliberate `make bootstrap`.
 .DEFAULT_GOAL := install
 
-.PHONY: bootstrap install install-vim install-claude install-git install-zsh install-herdr install-iterm2 install-brew check-brew test test-claude
+TUIOS_DIR ?= $(HOME)/Library/Application Support/tuios
+
+.PHONY: bootstrap install install-vim install-claude install-git install-zsh install-herdr install-tuios install-iterm2 install-brew check-brew test test-claude
 
 # Fresh machine: packages first, then the configs that depend on them.
 bootstrap: install-brew install
 
-install: install-vim install-claude install-git install-zsh install-herdr install-iterm2
+install: install-vim install-claude install-git install-zsh install-herdr install-tuios install-iterm2
 
 test: test-claude
 
@@ -78,16 +80,32 @@ install-herdr:
 	@cp ./herdr/config.toml $(HOME)/.config/herdr/config.toml
 	@herdr server reload-config >/dev/null 2>&1 || true
 
-# iTerm2 dynamic profile: iTerm2 watches the DynamicProfiles folder and hot-reloads it,
-# so the profile appears (or updates) without a restart. Editing the profile in iTerm2's
-# GUI does NOT write back to the file -- edit iterm2/Herdr.json instead.
+# tuios keeps its settings in one config.toml as well -- appearance, keybindings, dock -- and
+# on macOS reads it from Application Support, not ~/.config. Same rule as herdr: the repo's
+# copy is the source of truth and the installed one is overwritten wholesale. Note that
+# `tuios set-config` and the in-app settings page write to the installed file, so copy it
+# back here after changing settings that way. tuios watches the file and picks a save up by
+# itself; the apply is a best-effort nudge for a running daemon.
+#
+# Machine-local settings -- [hosts], which name this machine's ssh aliases -- go in
+# config.d/local.toml next to it instead. tuios reads every config.d/*.toml under config.toml,
+# and this target never touches that folder.
+install-tuios:
+	@mkdir -p "$(TUIOS_DIR)"
+	@cp ./tuios/config.toml "$(TUIOS_DIR)/config.toml"
+	@tuios config apply >/dev/null 2>&1 || true
+
+# iTerm2 dynamic profiles: iTerm2 watches the DynamicProfiles folder and hot-reloads it,
+# so the profiles appear (or update) without a restart. Every iterm2/*.json is one profile
+# (Herdr, Tuios). Editing a profile in iTerm2's GUI does NOT write back to the file -- edit
+# the json in iterm2/ instead.
 #
 # PassOnControlClick is a global preference, not a profile setting: it lets ctrl-click
 # reach apps that report the mouse (herdr opens links on ctrl-click) instead of opening
 # iTerm2's context menu. Takes effect after an iTerm2 restart.
 install-iterm2:
 	@mkdir -p "$(HOME)/Library/Application Support/iTerm2/DynamicProfiles"
-	@cp ./iterm2/Herdr.json "$(HOME)/Library/Application Support/iTerm2/DynamicProfiles/Herdr.json"
+	@cp ./iterm2/*.json "$(HOME)/Library/Application Support/iTerm2/DynamicProfiles/"
 	@defaults write com.googlecode.iterm2 PassOnControlClick -bool true
 
 # Statusline + /my-usage + standing preferences. Leaves ~/.claude/statusline.conf alone

@@ -10,7 +10,8 @@ make install-git    # ~/.gitignore_global, plus an include.path entry so this re
 make install-zsh    # a ~/.zshrc that sources this repo's .zshrc. Same idea: ~/.zshrc
                     # itself is never overwritten, tool installers keep appending to it
 make install-herdr  # ~/.config/herdr/config.toml, overwritten wholesale
-make install-iterm2 # iTerm2 "Herdr" profile as a dynamic profile, hot-reloaded by iTerm2
+make install-tuios  # ~/Library/Application Support/tuios/config.toml, overwritten wholesale
+make install-iterm2 # iTerm2 "Herdr" and "Tuios" profiles as dynamic profiles, hot-reloaded
 make check-brew     # what the Brewfile wants that is not installed yet
 make install-brew   # installs only what is missing, never upgrades
 make test
@@ -117,6 +118,41 @@ cp ~/.config/herdr/config.toml ./herdr/config.toml
 The target then reloads the running server's config (best-effort: no herdr, nothing to
 reload). herdr itself comes from the Brewfile — a plain homebrew-core formula.
 
+## Tuios
+
+```sh
+make install-tuios
+```
+
+Copies `tuios/config.toml` into `~/Library/Application Support/tuios/config.toml` (on macOS
+tuios reads it from there, not `~/.config`). Same rule as herdr: overwritten wholesale, the
+repo's copy is the source of truth. `tuios set-config` and the in-app settings page (`,` in
+window mode) write to the installed file, so after changing settings that way copy it back:
+
+```sh
+cp ~/Library/Application\ Support/tuios/config.toml ./tuios/config.toml
+```
+
+tuios watches the file, so an install takes effect without a restart.
+
+What it sets beyond the gruvbox theme, tiled startup and the daemon: which mode you are in
+is visible at a glance. The dock's mode pill shows `WINDOW` / `TERM` even while tiling is
+on, and the focused pane's border is yellow in window mode (keys manage panes) and green in
+terminal mode (keys go to the program). ⌥[ / ⌥] step to the previous / next workspace that
+has panes, in both modes, next to the stock ⌥1–⌥9. ⌘K clears the focused pane — scrollback
+and the rows above the prompt — through `tuios clear-history --screen`, bound as a `shell`
+command key on super+k; ctrl+k stays the shell's kill-line.
+
+Machine-local settings stay out of this file. `[hosts]` — the machines tuios links to over ssh,
+by their `~/.ssh/config` alias — goes in `config.d/local.toml` next to the installed
+`config.toml`. tuios reads every `config.d/*.toml` underneath `config.toml`, and
+`make install-tuios` never touches that folder. `tuios hosts add` writes a new host to the
+file that already holds `[hosts]`. On a machine with no `local.toml` yet, it may write the host
+into `config.toml` instead; move it over before copying `config.toml` back into the repo.
+
+The Claude Code hooks that report agent state to tuios are not part of this config: they
+live in `~/.claude/settings.json`, written by `tuios integration install claude-code`.
+
 ## ZSH
 
 ```sh
@@ -168,14 +204,16 @@ Plugin for highlighting command: https://github.com/zsh-users/zsh-syntax-highlig
 
 ## Agnoster theme
 
-Font — JetBrains Mono (https://github.com/JetBrains/JetBrainsMono), installed by the
+Font — **JetBrainsMonoNL Nerd Font Mono**: JetBrains Mono patched with Nerd Font icons
+(https://www.nerdfonts.com/), without ligatures, icons one cell wide. Installed by the
 Brewfile, or on its own:
 
 ```sh
-brew install --cask font-jetbrains-mono
+brew install --cask font-jetbrains-mono-nerd-font
 ```
 
-Then pick it in iTerm: CMD+i -> Text -> Font.
+The dynamic profiles below already use it (`JetBrainsMonoNLNFM-Regular 12`); for any other
+profile pick it in iTerm: CMD+i -> Text -> Font.
 
 Alternatives: Powerline fonts (https://github.com/powerline/fonts), of which
 FiraMono (https://github.com/powerline/fonts/tree/master/FiraMono).
@@ -184,11 +222,14 @@ Gruvbox: https://github.com/morhetz/gruvbox
 
 ## iTerm 2 Preferences
 
-### Herdr profile
+### Herdr and Tuios profiles
 
 ```sh
 make install-iterm2
 ```
+
+Every `iterm2/*.json` is installed as a dynamic profile. Both share the same colors and
+font; they differ in key handling.
 
 Installs `iterm2/Herdr.json` as an iTerm2 **dynamic profile**: iTerm2 watches
 `~/Library/Application Support/iTerm2/DynamicProfiles/` and hot-reloads it, so the
@@ -197,8 +238,25 @@ that make herdr's chords work in iTerm2 (⌘K → ctrl+k, ⌥⇧[/] → kitty-en
 brackets, ⌘←/⌘→ → Home/End) — without them iTerm2 composes `”`/`’` or sends `^A` and
 herdr never sees the keys.
 
-Editing the profile in iTerm2's GUI does **not** write back to the file. Change settings
-by editing `iterm2/Herdr.json` (the repo's copy is the source of truth), or re-export the
+`iterm2/Tuios.json` is for tuios (https://tuios.dev/), whose chords are mostly Option-based
+(`opt+1`–`9` workspaces, `opt+h/j/k/l` preselect, `opt+esc` out of terminal mode). So the
+left Option key sends Esc+ (right Option stays normal, for typing composed characters).
+⌥←/→/↑/↓ send the xterm alt+arrow sequences (`ESC [1;3D` and so on) that tuios reads as
+`alt+left` etc. — its pane-focus keys in terminal mode — instead of the Herdr profile's
+`Esc b`/`Esc f` word jumps. ⌥[ and ⌥] send kitty-encoded alt+[ / alt+] (`ESC [91;3u`,
+`ESC [93;3u`) for tuios's workspace cycling: with Esc+ they would otherwise go out as a bare
+`ESC [` / `ESC ]`, the start of an escape sequence. ⌘K sends kitty-encoded super+k
+(`ESC [107;9u`) instead of running iTerm2's own Clear Buffer, which tuios would never see.
+The other herdr-specific chords are left out. The
+remaining mappings are plain text editing: ⌘←/⌘→ → Home/End, ⌘⌫ → ctrl+u, ⌥⌫ and
+forward-delete. Keymaps are still provisional.
+
+A tab that is already open does not always pick up a changed profile: once a tab's own
+settings were touched (Edit Session, ⌘+/⌘− font size) it keeps the copy it had. If a new key
+mapping does nothing, re-apply the profile to the tab or open a new one.
+
+Editing a profile in iTerm2's GUI does **not** write back to the file. Change settings
+by editing the json in `iterm2/` (the repo's copy is the source of truth), or re-export the
 profile from iTerm2 and re-apply the two hand edits the file needs: regenerate the `Guid`
 (it must not duplicate a regular profile's, or iTerm2 silently ignores the dynamic one)
 and keep the JSON wrapped in `{"Profiles": [...]}`.
